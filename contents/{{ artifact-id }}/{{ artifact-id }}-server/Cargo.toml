@@ -1,0 +1,23 @@
+[package]
+name = "{{ artifact-id }}-server"
+version = "0.1.0"
+authors = ["{{ author_full }}"]
+edition = "2018"
+
+[[bin]]
+name = "{{ artifact-id }}"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+{{ artifact-id }}-core = { path = "../{{ artifact-id }}-core" }
+actix-web = "3.3"
+actix-web-prom = "0.5"
+actix-cors = "0.5"
+clap = "2"
+dotenv = "0.15"
+futures = "0.3"
+log = "0.4"
+loggerv = "0.7"
+prometheus = "0.11"
+

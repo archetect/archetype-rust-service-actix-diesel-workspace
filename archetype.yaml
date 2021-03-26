@@ -1,0 +1,48 @@
+---
+description: "A Rust Service using Actix Web and Diesel"
+authors: [ "Jimmie Fulton <jimmie.fulton@gmail.com>" ]
+languages: [ "Rust" ]
+frameworks: [ "Actix Web", "Diesel", "Clap" ]
+tags: [ "Service", "Workspace" ]
+
+script:
+  - set:
+      #Prompted Variables
+      prefix:
+        prompt: 'Service Name:'
+      suffix:
+        prompt: "Suffix:"
+        default: "Service"
+      author_full:
+        prompt: 'Author (Full):'
+      author:
+        prompt: 'Author (Short):'
+      server-port:
+        prompt: "Server Port:"
+        type: int
+        default: "8080"
+      management-port:
+        prompt: "Management Port:"
+        type: int
+        default: "{{ server-port + 1 }}"
+
+      # Derived Variables
+      prefix-name:
+        value: "{{ prefix | train_case }}"
+      prefix_name:
+        value: "{{ prefix | snake_case }}"
+      suffix-name:
+        value: "{{ suffix | train_case }}"
+      suffix_name:
+        value: "{{ suffix | snake_case }}"
+      artifact-id:
+        value: "{{ prefix-name }}-{{ suffix-name }}"
+      artifact_id:
+        value: "{{ prefix_name }}_{{ suffix_name }}"
+      ARTIFACT_ID:
+        value: "{{ artifact_id | constant_case }}"
+
+  - render:
+      directory:
+        source: "contents"
+

@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "{{ artifact-id }}-core",
+    "{{ artifact-id }}-persistence",
+    "{{ artifact-id }}-server",
+]
