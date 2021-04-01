@@ -2,6 +2,17 @@ use log::{trace};
 
 pub mod metrics;
 
+#[derive(Clone)]
+pub struct {{ ArtifactId }} {
+
+}
+
+impl {{ ArtifactId }} {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 pub fn get_greeting() -> &'static str {
     trace!("Preparing greeting");
     metrics::EXAMPLE_COUNTER.inc();

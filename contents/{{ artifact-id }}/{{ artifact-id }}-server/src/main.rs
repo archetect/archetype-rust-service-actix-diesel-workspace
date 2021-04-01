@@ -1,10 +1,11 @@
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpServer, middleware, web};
+use actix_web::middleware::normalize::TrailingSlash;
 use actix_web_prom::PrometheusMetrics;
 use clap::ArgMatches;
 use futures::future;
 use log::{debug, warn};
 
-use {{artifact_id}}_core::metrics;
+use {{artifact_id}}_core::{metrics, {{ ArtifactId }}};
 
 mod cli;
 mod routes;
@@ -31,6 +32,8 @@ async fn main() -> std::io::Result<()> {
         warn!("Enabling permissive Cors configuration!");
     }
 
+    let {{ suffix_name }} = {{ ArtifactId }}::new();
+
     let server = HttpServer::new(move || {
         let cors = if cors_permissive {
             actix_cors::Cors::permissive()
@@ -40,14 +43,15 @@ async fn main() -> std::io::Result<()> {
         let mut app = App::new()
             .wrap(server_metrics.clone())
             .wrap(cors)
-            .service(web::resource("/").to(routes::server_root))
-            .route("/", web::get().to(routes::greet))
-            .route("/greet", web::get().to(routes::greet))
-            .route("/greet/{name}", web::get().to(routes::greet));
+            .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
+            .app_data(web::JsonConfig::default())
+            .data({{ suffix_name }}.clone())
+            .configure(routes::server_routes)
+            ;
         if !separate_management_port {
             app = app
-                .service(web::resource("/ping").to(routes::ping))
-                .service(web::resource("/health").to(routes::health));
+                .configure(routes::management_routes)
+            ;
         }
         app
     })
@@ -59,9 +63,9 @@ async fn main() -> std::io::Result<()> {
         let management = HttpServer::new(move || {
             App::new()
                 .wrap(management_metrics.clone())
+                .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
                 .service(web::resource("/").to(routes::management_root))
-                .service(web::resource("/ping").to(routes::ping))
-                .service(web::resource("/health").to(routes::health))
+                .configure(routes::management_routes)
         })
             .bind(("127.0.0.1", management_port))?
             .run();

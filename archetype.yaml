@@ -43,6 +43,8 @@ script:
         value: "{{ prefix_name }}_{{ suffix_name }}"
       ARTIFACT_ID:
         value: "{{ artifact_id | constant_case }}"
+      ArtifactId:
+        value: "{{ artifact-id | pascal_case }}"
 
   - render:
       directory:

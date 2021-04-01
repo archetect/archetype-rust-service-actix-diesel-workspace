@@ -1,7 +1,18 @@
-use actix_web::{HttpRequest, Responder, HttpResponse};
+use actix_web::{HttpRequest, HttpResponse, Responder, web::{self, ServiceConfig}};
 
 use {{ artifact_id }}_core::get_greeting;
 use {{ artifact_id }}_core::metrics;
+
+pub fn server_routes(config: &mut ServiceConfig) {
+    config.route("/", web::get().to(server_root));
+    config.route("/greet", web::get().to(greet));
+    config.route("/greet/{name}", web::get().to(greet));
+}
+
+pub fn management_routes(config: &mut ServiceConfig) {
+    config.route("/ping", web::get().to(ping));
+    config.route("/health", web::get().to(health));
+}
 
 pub fn server_root() -> HttpResponse {
     HttpResponse::Ok().body(metrics::METRICS_PREFIX.to_uppercase())

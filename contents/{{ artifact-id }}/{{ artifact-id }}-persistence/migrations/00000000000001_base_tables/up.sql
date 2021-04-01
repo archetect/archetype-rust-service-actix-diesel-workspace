@@ -4,3 +4,5 @@ CREATE TABLE {{ prefix_name }} (
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
  );
+
+SELECT diesel_manage_updated_at('{{ prefix_name }}');
