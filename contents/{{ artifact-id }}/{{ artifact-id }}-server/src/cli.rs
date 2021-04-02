@@ -57,13 +57,6 @@ fn is_valid_port(value: String) -> Result<(), String> {
         .map(|_| ())
 }
 
-pub fn configure(matches: &ArgMatches) {
-    loggerv::Logger::new()
-        .verbosity(matches.occurrences_of("verbosity"))
-        .level(true)
-        .no_module_path()
-        .module_path(false)
-        .base_level(log::Level::Info)
-        .init()
-        .unwrap();
+pub fn configure(_matches: &ArgMatches) {
+
 }

@@ -3,17 +3,24 @@ use actix_web::middleware::normalize::TrailingSlash;
 use actix_web_prom::PrometheusMetrics;
 use clap::ArgMatches;
 use futures::future;
-use log::{debug, warn};
+use tracing::{debug, warn};
+use tracing_actix_web::TracingLogger;
 
-use {{artifact_id}}_core::{metrics, {{ ArtifactId }}};
+use {{artifact_id}}_core::{ {{ ArtifactId }}, metrics};
+
+use crate::telemetry::{get_subscriber, init_subscriber};
 
 mod cli;
 mod routes;
+mod telemetry;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let matches = cli::app().get_matches();
     cli::configure(&matches);
+    
+    let subscriber = get_subscriber("{{ artifact-id }}".into(), "info".into());
+    init_subscriber(subscriber);
 
     debug!("Initializing...");
 
@@ -44,6 +51,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(server_metrics.clone())
             .wrap(cors)
             .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
+            .wrap(TracingLogger)
             .app_data(web::JsonConfig::default())
             .data({{ suffix_name }}.clone())
             .configure(routes::server_routes)

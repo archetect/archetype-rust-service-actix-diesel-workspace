@@ -1,4 +1,4 @@
-use log::{trace};
+use tracing::{trace};
 
 use {{ artifact_id }}_persistence::{establish_connection, PgPool};
 

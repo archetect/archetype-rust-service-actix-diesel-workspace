@@ -9,4 +9,4 @@ edition = "2018"
 chrono = "0.4"
 diesel = { version = "1.4", features = ["chrono", "postgres", "r2d2"] }
 dotenv = "0.15"
-log = "0.4"
+tracing = "0.1"
