@@ -1,15 +1,21 @@
 use log::{trace};
 
+use {{ artifact_id }}_persistence::{establish_connection, PgPool};
+
 pub mod metrics;
 
 #[derive(Clone)]
 pub struct {{ ArtifactId }} {
-
+    pool: PgPool
 }
 
 impl {{ ArtifactId }} {
     pub fn new() -> Self {
-        Self {}
+        Self { pool: establish_connection() }
+    }
+
+    pub fn new_with_pool(pool: PgPool) -> {{ ArtifactId }} {
+        Self { pool }
     }
 }
 
