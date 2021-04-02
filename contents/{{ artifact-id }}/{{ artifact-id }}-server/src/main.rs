@@ -48,10 +48,10 @@ async fn main() -> std::io::Result<()> {
             actix_cors::Cors::default()
         };
         let mut app = App::new()
+            .wrap(TracingLogger)
             .wrap(server_metrics.clone())
             .wrap(cors)
             .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
-            .wrap(TracingLogger)
             .app_data(web::JsonConfig::default())
             .data({{ suffix_name }}.clone())
             .configure(routes::server_routes)
