@@ -1,29 +1,70 @@
-use tracing::subscriber::set_global_default;
-use tracing::Subscriber;
+use clap::{ArgMatches, value_t};
+use tracing::Level;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
-use tracing_log::LogTracer;
-use tracing_subscriber::{layer::SubscriberExt, EnvFilter, Registry};
+use tracing_subscriber::{EnvFilter, layer::SubscriberExt};
+use tracing_subscriber::fmt::format::FmtSpan;
+use tracing_subscriber::util::SubscriberInitExt;
 
-/// Compose multiple layers into a `tracing`'s subscriber.
-///
-/// # Implementation Notes
-///
-/// We are using `impl Subscriber` as return type to avoid having to spell out the actual
-/// type of the returned subscriber, which is indeed quite complex.
-pub fn get_subscriber(name: String, env_filter: String) -> impl Subscriber + Sync + Send {
-    let env_filter =
-        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
-    let formatting_layer = BunyanFormattingLayer::new(name, std::io::stdout);
-    Registry::default()
-        .with(env_filter)
-        .with(JsonStorageLayer)
-        .with(formatting_layer)
+use crate::cli::LogFormat;
+
+pub fn init_tracing(config: &ArgMatches) {
+    let mut filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
+    match config.occurrences_of("verbosity") {
+        0 => (),
+        1 => { filter = filter.add_directive(Level::DEBUG.into()); }
+        _ => {
+            filter = filter.add_directive("{{ artifact_id }}=trace".parse().unwrap());
+        }
+    };
+    let format = value_t!(config, "log-format", crate::cli::LogFormat).unwrap_or_else(|e| e.exit());
+    let span_events = FmtSpan::FULL;
+    match format {
+        LogFormat::Standard => { register_standard_subscriber(filter, span_events) }
+        LogFormat::Json => { register_json_subscriber(filter, span_events) }
+        LogFormat::Pretty => { register_pretty_subscriber(filter, span_events) }
+        LogFormat::Compact => { register_compact_subscriber(filter, span_events) }
+        LogFormat::Bunyan => { register_bunyan_subscriber(filter) }
+    }
 }
 
-/// Register a subscriber as global default to process span data.
-///
-/// It should only be called once!
-pub fn init_subscriber(subscriber: impl Subscriber + Sync + Send) {
-    LogTracer::init().expect("Failed to set logger");
-    set_global_default(subscriber).expect("Failed to set subscriber");
+fn register_standard_subscriber(filter: EnvFilter, span_events: FmtSpan) {
+    tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_span_events(span_events)
+        .init()
+}
+
+fn register_json_subscriber(filter: EnvFilter, span_events: FmtSpan) {
+    tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_span_events(span_events)
+        .json()
+        .with_current_span(false)
+        .init()
+}
+
+fn register_pretty_subscriber(filter: EnvFilter, span_events: FmtSpan) {
+    tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_span_events(span_events)
+        .pretty()
+        .with_level(true)
+        .with_thread_names(true)
+        .init()
+}
+
+fn register_compact_subscriber(filter: EnvFilter, span_events: FmtSpan) {
+    tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_span_events(span_events)
+        .compact()
+        .init()
+}
+
+fn register_bunyan_subscriber(filter: EnvFilter) {
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(JsonStorageLayer)
+        .with(BunyanFormattingLayer::new("{{ artifact-id }}".into(), std::io::stdout))
+        .init();
 }

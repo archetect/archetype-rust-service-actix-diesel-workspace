@@ -1,5 +1,16 @@
-use clap::{ArgMatches, crate_authors, crate_description, crate_name, crate_version};
-use clap::{App, Arg};
+use clap::{crate_authors, crate_description, crate_name, crate_version, arg_enum};
+use clap::{App, Arg, ArgMatches};
+
+arg_enum! {
+    #[derive(PartialEq, Debug)]
+    pub enum LogFormat {
+        Standard,
+        Json,
+        Pretty,
+        Compact,
+        Bunyan,
+    }
+}
 
 pub fn app() -> App<'static, 'static> {
     dotenv::dotenv().ok();
@@ -15,6 +26,13 @@ pub fn app() -> App<'static, 'static> {
                 .multiple(true)
                 .global(true)
                 .help("Increases the level of verbosity"),
+        )
+        .arg(
+            Arg::with_name("log-format")
+                .long("log-format")
+                .possible_values(&LogFormat::variants())
+                .default_value("Standard")
+                .case_insensitive(true)
         )
         .arg(
             Arg::with_name("server-port")

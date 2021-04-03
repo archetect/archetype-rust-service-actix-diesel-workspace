@@ -8,7 +8,7 @@ use tracing_actix_web::TracingLogger;
 
 use {{artifact_id}}_core::{ {{ ArtifactId }}, metrics};
 
-use crate::telemetry::{get_subscriber, init_subscriber};
+use crate::telemetry::{init_tracing};
 
 mod cli;
 mod routes;
@@ -18,15 +18,14 @@ mod telemetry;
 async fn main() -> std::io::Result<()> {
     let matches = cli::app().get_matches();
     cli::configure(&matches);
-    
-    let subscriber = get_subscriber("{{ artifact-id }}".into(), "info".into());
-    init_subscriber(subscriber);
+
+    init_tracing(&matches);
 
     debug!("Initializing...");
 
     let server_port = matches.value_of("server-port").unwrap().parse::<u16>().unwrap();
     let management_port = matches.value_of("management-port").unwrap().parse::<u16>().unwrap();
-    let separate_management_port = server_port != management_port;
+    let separate_management_port = (server_port != management_port) && server_port != 0;
 
     let server_metrics = if separate_management_port {
         server_metrics()
