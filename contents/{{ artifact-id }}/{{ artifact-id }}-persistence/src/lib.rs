@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate diesel;
 
-use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ Pool, PooledConnection, ConnectionManager, PoolError };
 use std::env;

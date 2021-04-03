@@ -1,5 +1,5 @@
 use clap::{crate_authors, crate_description, crate_name, crate_version, arg_enum};
-use clap::{App, Arg, ArgMatches};
+use clap::{App, Arg};
 
 arg_enum! {
     #[derive(PartialEq, Debug)]
@@ -7,7 +7,6 @@ arg_enum! {
         Standard,
         Json,
         Pretty,
-        Compact,
         Bunyan,
     }
 }
@@ -73,8 +72,4 @@ fn is_valid_port(value: String) -> Result<(), String> {
     value.parse::<u16>()
         .map_err(|_| format!("Ports must be an integer between 0 and {}", u16::MAX))
         .map(|_| ())
-}
-
-pub fn configure(_matches: &ArgMatches) {
-
 }
