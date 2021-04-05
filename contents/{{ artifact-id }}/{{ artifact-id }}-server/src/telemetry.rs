@@ -26,6 +26,7 @@ pub fn init_tracing(config: &ArgMatches) {
         LogFormat::Json => { register_json_subscriber(filter, span_events) }
         LogFormat::Pretty => { register_pretty_subscriber(filter, span_events) }
         LogFormat::Bunyan => { register_bunyan_subscriber(filter) }
+        LogFormat::None => ()
     }
 }
 
@@ -33,6 +34,7 @@ fn register_standard_subscriber(filter: EnvFilter, span_events: FmtSpan) {
     tracing_subscriber::fmt()
         .with_env_filter(filter)
         .with_span_events(span_events)
+        .with_ansi(false)
         .init()
 }
 

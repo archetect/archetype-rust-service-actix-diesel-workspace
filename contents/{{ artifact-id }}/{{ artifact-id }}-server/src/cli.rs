@@ -8,6 +8,7 @@ arg_enum! {
         Json,
         Pretty,
         Bunyan,
+        None,
     }
 }
 

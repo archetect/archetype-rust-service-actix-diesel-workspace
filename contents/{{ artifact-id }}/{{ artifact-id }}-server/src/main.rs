@@ -65,6 +65,7 @@ async fn main() -> std::io::Result<()> {
         let management_metrics = telemetry::management_metrics();
         let management = HttpServer::new(move || {
             App::new()
+                .wrap(TracingLogger)
                 .wrap(management_metrics.clone())
                 .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
                 .service(web::resource("/").to(routes::management_root))
