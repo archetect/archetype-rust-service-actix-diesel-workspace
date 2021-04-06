@@ -2,6 +2,7 @@
 
 members = [
     "{{ artifact-id }}-api",
+    "{{ artifact-id }}-client",
     "{{ artifact-id }}-core",
     "{{ artifact-id }}-persistence",
     "{{ artifact-id }}-server",
