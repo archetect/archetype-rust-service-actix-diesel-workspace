@@ -34,7 +34,7 @@ fn register_standard_subscriber(filter: EnvFilter, span_events: FmtSpan) {
     tracing_subscriber::fmt()
         .with_env_filter(filter)
         .with_span_events(span_events)
-        .with_ansi(false)
+        .with_ansi(atty::is(atty::Stream::Stdout))
         .init()
 }
 
@@ -52,8 +52,6 @@ fn register_pretty_subscriber(filter: EnvFilter, span_events: FmtSpan) {
         .with_env_filter(filter)
         .with_span_events(span_events)
         .pretty()
-        .with_level(true)
-        .with_thread_names(true)
         .init()
 }
 
