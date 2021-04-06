@@ -1,21 +1,35 @@
+use async_trait::async_trait;
 use tracing::{trace};
 
+use {{ artifact_id }}_api::{{ArtifactId}};
+use {{ artifact_id }}_api::models::{{PrefixName}};
 use {{ artifact_id }}_persistence::{establish_connection, PgPool};
 
 pub mod metrics;
 
 #[derive(Clone)]
-pub struct {{ ArtifactId }} {
+pub struct {{ ArtifactId }}Core {
     pool: PgPool
 }
 
-impl {{ ArtifactId }} {
+impl {{ ArtifactId }}Core {
     pub fn new() -> Self {
         Self { pool: establish_connection() }
     }
 
-    pub fn new_with_pool(pool: PgPool) -> {{ ArtifactId }} {
+    pub fn new_with_pool(pool: PgPool) -> Self {
         Self { pool }
+    }
+}
+
+#[async_trait]
+impl {{ ArtifactId }} for {{ ArtifactId }}Core {
+    async fn get_{{prefix_name | pluralize }}(&self) -> Vec<{{PrefixName}}> {
+        // let _conn = self.pool.get().unwrap();
+        let mut results = vec![];
+        results.push({{PrefixName}}::new("Example 1".into()));
+        results.push({{PrefixName}}::new("Example 2".into()));
+        results
     }
 }
 

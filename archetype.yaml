@@ -33,6 +33,8 @@ script:
         value: "{{ prefix | snake_case }}"
       PrefixName:
         value: "{{ prefix | pascal_case }}"
+      prefixName:
+        value: "{{ prefix | camel_case }}"
       suffix-name:
         value: "{{ suffix | train_case }}"
       suffix_name:

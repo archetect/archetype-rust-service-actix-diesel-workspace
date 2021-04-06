@@ -5,7 +5,7 @@ use futures::future;
 use tracing::{debug, warn};
 use tracing_actix_web::TracingLogger;
 
-use {{artifact_id}}_core::{{ ArtifactId }};
+use {{artifact_id}}_core::{{ ArtifactId }}Core;
 
 mod cli;
 mod routes;
@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
         warn!("Enabling permissive Cors configuration!");
     }
 
-    let {{ suffix_name }} = {{ ArtifactId }}::new();
+    let {{ suffix_name }} = {{ ArtifactId }}Core::new();
 
     let server = HttpServer::new(move || {
         let cors = if cors_permissive {

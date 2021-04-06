@@ -22,7 +22,7 @@ pub fn init_tracing(config: &ArgMatches) {
     let format = value_t!(config, "log-format", crate::cli::LogFormat).unwrap_or_else(|e| e.exit());
     let span_events = FmtSpan::FULL;
     match format {
-        LogFormat::Standard => { register_standard_subscriber(filter, span_events) }
+        LogFormat::Standard => { register_standard_subscriber(filter, FmtSpan::ENTER | FmtSpan::CLOSE) }
         LogFormat::Json => { register_json_subscriber(filter, span_events) }
         LogFormat::Pretty => { register_pretty_subscriber(filter, span_events) }
         LogFormat::Bunyan => { register_bunyan_subscriber(filter) }
