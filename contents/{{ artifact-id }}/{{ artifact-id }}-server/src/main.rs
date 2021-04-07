@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
         }
         app
     })
-        .bind(("127.0.0.1", server_port))?
+        .bind(("0.0.0.0", server_port))?
         .run();
 
     if separate_management_port {
@@ -71,7 +71,7 @@ async fn main() -> std::io::Result<()> {
                 .service(web::resource("/").to(routes::management_root))
                 .configure(routes::management_routes)
         })
-            .bind(("127.0.0.1", management_port))?
+            .bind(("0.0.0.0", management_port))?
             .run();
         future::try_join(server, management).await?;
     } else {

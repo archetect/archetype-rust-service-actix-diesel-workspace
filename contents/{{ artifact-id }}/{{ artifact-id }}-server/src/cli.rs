@@ -30,6 +30,7 @@ pub fn app() -> App<'static, 'static> {
         .arg(
             Arg::with_name("log-format")
                 .long("log-format")
+                .env("LOG_FORMAT")
                 .possible_values(&LogFormat::variants())
                 .default_value("Standard")
                 .case_insensitive(true)
