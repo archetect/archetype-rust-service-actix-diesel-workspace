@@ -49,7 +49,7 @@ pub fn app() -> App<'static, 'static> {
                 .short("m")
                 .long("management-port")
                 .env("{{ ARTIFACT_ID}}_MANAGEMENT_PORT")
-                .default_value("{{ management-port}}")
+                .default_value("{{ management-port }}")
                 .validator(is_valid_port)
                 .help("Management Port")
         )
