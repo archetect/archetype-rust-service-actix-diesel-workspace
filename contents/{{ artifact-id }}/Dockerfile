@@ -7,6 +7,7 @@ COPY . .
 # Compute a lock-like file for our project
 RUN cargo chef prepare  --recipe-path recipe.json
 
+
 ################
 # Caching Stage
 ################
@@ -23,7 +24,7 @@ RUN cargo chef cook --release --recipe-path recipe.json
 FROM rust:1.51 AS builder
 WORKDIR app
 COPY --from=cacher /app/target target
-COPY --from=cacher /usr/local/cargo /usr/local/cargo
+COPY --from=cacher $CARGO_HOME $CARGO_HOME
 COPY . .
 RUN cargo build --release
 
@@ -33,15 +34,13 @@ RUN cargo build --release
 ################
 FROM debian:buster-slim AS runtime
 WORKDIR app
-
-# Dynamically Linked SSL support
+# System Dependencies (SSL, PostgreSQL Client)
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends openssl postgresql-client \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
-
 COPY --from=builder /app/target/release/{{ artifact-id }} {{ artifact-id }}
 ENV LOG_FORMAT bunyan
 ENV {{ ARTIFACT_ID}}_SERVER_PORT 8080
