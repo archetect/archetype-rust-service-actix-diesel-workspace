@@ -1,4 +1,4 @@
-use clap::{crate_authors, crate_description, crate_name, crate_version, arg_enum};
+use clap::{crate_authors, crate_description, crate_name, crate_version, arg_enum, ArgMatches};
 use clap::{App, Arg};
 
 arg_enum! {
@@ -39,8 +39,8 @@ pub fn app() -> App<'static, 'static> {
             Arg::with_name("server-port")
                 .short("p")
                 .long("server-port")
-                .env("{{ ARTIFACT_ID}}_SERVER_PORT")
-                .default_value("{{ server-port }}")
+                .env("CUSTOMER_SERVICE_SERVER_PORT")
+                .default_value("8080")
                 .validator(is_valid_port)
                 .help("Server Port")
         )
@@ -48,8 +48,8 @@ pub fn app() -> App<'static, 'static> {
             Arg::with_name("management-port")
                 .short("m")
                 .long("management-port")
-                .env("{{ ARTIFACT_ID}}_MANAGEMENT_PORT")
-                .default_value("{{ management-port }}")
+                .env("CUSTOMER_SERVICE_MANAGEMENT_PORT")
+                .default_value("8081")
                 .validator(is_valid_port)
                 .help("Management Port")
         )
@@ -68,6 +68,23 @@ pub fn app() -> App<'static, 'static> {
                 .long_help("Configures a Permissive Cors Configuration for local development purposes via Environment Variable.\
                     \nNever use in production!")
         )
+}
+
+
+pub fn is_cors_permissive(matches: &ArgMatches) -> bool {
+    // The cors-permissive flag takes precedence
+    if matches.is_present("cors-permissive") {
+        return true;
+    }
+    // If CORS_PERMISSIVE environment variable has been set to anything other than false
+    matches.value_of("cors-permissive-env")
+        .map_or(false, |value| {
+            if let Ok(value) = value.parse::<bool>() {
+                value
+            } else {
+                true
+            }
+        }, )
 }
 
 fn is_valid_port(value: String) -> Result<(), String> {
