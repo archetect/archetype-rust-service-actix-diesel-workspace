@@ -22,11 +22,11 @@ pub fn management_routes(config: &mut ServiceConfig) {
 }
 
 pub fn server_root() -> HttpResponse {
-    HttpResponse::Ok().body(metrics::METRICS_PREFIX.to_uppercase())
+    HttpResponse::Ok().body("{{ ARTIFACT_ID }}")
 }
 
 pub fn management_root() -> HttpResponse {
-    HttpResponse::Ok().body(format!("{}_MANAGEMENT",metrics::METRICS_PREFIX.to_uppercase()))
+    HttpResponse::Ok().body("{{ ARTIFACT_ID }}_MANAGEMENT")
 }
 
 pub fn ping() -> HttpResponse {

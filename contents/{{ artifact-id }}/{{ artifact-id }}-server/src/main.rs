@@ -20,6 +20,7 @@ async fn main() -> std::io::Result<()> {
     {{ ArtifactId }}Server::new(service_core)
         .with_host("0.0.0.0")
         .with_server_port(server_port)
+        .with_management_port(management_port)
         .with_cors_permissive(cli::is_cors_permissive(&matches))
         .build()?
         .run()

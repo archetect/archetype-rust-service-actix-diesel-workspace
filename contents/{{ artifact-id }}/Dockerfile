@@ -34,9 +34,9 @@ RUN cargo build --release
 ################
 FROM debian:buster-slim AS runtime
 WORKDIR app
-# System Dependencies (SSL, PostgreSQL Client)
+# System Dependencies (PostgreSQL Client)
 RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends openssl postgresql-client \
+    && apt-get install -y --no-install-recommends postgresql-client \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \

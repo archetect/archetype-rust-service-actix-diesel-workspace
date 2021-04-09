@@ -23,9 +23,3 @@ pub fn establish_connection() -> PgPool {
         .expect("{{ ARTIFACT_ID }}_DATABASE_URL must be set");
     init_pool(&database_url).expect("Error loading PgPool")
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-}
