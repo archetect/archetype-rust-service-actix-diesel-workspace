@@ -6,4 +6,9 @@ members = [
     "{{ artifact-id }}-core",
     "{{ artifact-id }}-persistence",
     "{{ artifact-id }}-server",
+    "xtask",
+]
+
+default-members = [
+    "{{ artifact-id }}-server",
 ]

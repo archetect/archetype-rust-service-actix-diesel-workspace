@@ -3,7 +3,7 @@ services:
   server:
     image: {{ artifact-id }}:latest
     environment:
-      {{ ARTIFACT_ID }}_DATABASE_URL: 'postgres://postgres:@host.docker.internal/{{ artifact_id }}'
+      {{ ARTIFACT_ID }}_DATABASE_URL: 'postgres://postgres:password@host.docker.internal/{{ artifact_id }}'
     ports:
       - "{{ server-port }}:8080"
       - "{{ management-port }}:8081"
