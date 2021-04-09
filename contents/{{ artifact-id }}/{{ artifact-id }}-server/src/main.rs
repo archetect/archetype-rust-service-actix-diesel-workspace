@@ -17,8 +17,9 @@ async fn main() -> std::io::Result<()> {
     let server_port = matches.value_of("server-port").unwrap().parse::<u16>().unwrap();
     let management_port = matches.value_of("management-port").unwrap().parse::<u16>().unwrap();
 
-    {{ ArtifactId }}Server::new(server_port, service_core)
-        .with_management_port(management_port)
+    {{ ArtifactId }}Server::new(service_core)
+        .with_host("0.0.0.0")
+        .with_server_port(server_port)
         .with_cors_permissive(cli::is_cors_permissive(&matches))
         .build()?
         .run()

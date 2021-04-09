@@ -28,3 +28,10 @@ tracing-bunyan-formatter = "0.1"
 tracing-log = "0.1"
 tracing-actix-web = "0.2"
 
+[dev-dependencies]
+{{ artifact-id }}-client = { path = "../{{ artifact-id }}-client" }
+actix-rt = "1"
+reqwest = { version = "0.10", default-features = false, features = ["rustls-tls", "json"] }
+
+[features]
+expensive_tests = []

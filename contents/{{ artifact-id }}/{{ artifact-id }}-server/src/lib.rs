@@ -19,8 +19,8 @@ pub struct {{ ArtifactId }}Server {
 }
 
 impl {{ ArtifactId }}Server {
-    pub fn new(server_port: u16, service_core: {{ ArtifactId }}Core) -> Builder {
-        Builder::new(server_port, service_core )
+    pub fn new(service_core: {{ ArtifactId }}Core) -> Builder {
+        Builder::new(8080, service_core )
     }
 
     pub fn server_port(&self) -> u16 {
@@ -41,6 +41,7 @@ impl {{ ArtifactId }}Server {
 }
 
 pub struct Builder {
+    host: String,
     server_port: u16,
     management_port: Option<u16>,
     service_core: {{ ArtifactId }}Core,
@@ -48,8 +49,9 @@ pub struct Builder {
 }
 
 impl Builder {
-    pub fn new(server_port: u16, service_core: {{ ArtifactId }}Core) -> Self {
+    fn new(server_port: u16, service_core: {{ ArtifactId }}Core) -> Self {
         Builder {
+            host: "127.0.0.1".into(),
             server_port,
             management_port: None,
             service_core,
@@ -57,8 +59,18 @@ impl Builder {
         }
     }
 
+    pub fn with_host<T: Into<String>>(mut self, host: T) -> Self {
+        self.host = host.into();
+        self
+    }
+
     pub fn with_server_port(mut self, server_port: u16) -> Self {
         self.server_port = server_port;
+        self
+    }
+    
+    pub fn with_random_server_port(mut self) -> Self {
+        self.server_port = 0;
         self
     }
 
@@ -75,7 +87,9 @@ impl Builder {
     pub fn build(self) -> Result<{{ ArtifactId }}Server, std::io::Error> {
         let service_core = self.service_core.clone();
 
-        let service_listener = TcpListener::bind(("0.0.0.0", self.server_port))?;
+        let host = &self.host;
+
+        let service_listener = TcpListener::bind((host.as_str(), self.server_port))?;
         let server_port = service_listener.local_addr().unwrap().port();
 
         let management_port = if let Some(management_port) = self.management_port {
@@ -130,7 +144,7 @@ impl Builder {
                     .service(web::resource("/").to(routes::management_root))
                     .configure(routes::management_routes)
             })
-                .bind(("0.0.0.0", management_port))?
+                .bind((host.as_str(), management_port))?
                 .run())
         } else {
             None
