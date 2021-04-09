@@ -1,1 +1,1 @@
-drop table {{ prefix_name }};
+drop table "{{ prefix_name }}";
