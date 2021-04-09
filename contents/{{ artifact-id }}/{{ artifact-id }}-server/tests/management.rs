@@ -1,4 +1,4 @@
-use actix_web::http::StatusCode;
+use reqwest::StatusCode;
 
 mod common;
 

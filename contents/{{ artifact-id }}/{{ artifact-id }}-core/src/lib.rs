@@ -24,12 +24,12 @@ impl {{ ArtifactId }}Core {
 
 #[async_trait]
 impl {{ ArtifactId }} for {{ ArtifactId }}Core {
-    async fn get_{{prefix_name | pluralize }}(&self) -> Vec<{{PrefixName}}> {
+    async fn get_{{prefix_name | pluralize }}(&self) -> Result<Vec<{{PrefixName}}>, Box<dyn std::error::Error>> {
         // let _conn = self.pool.get().unwrap();
         let mut results = vec![];
         results.push({{PrefixName}}::new("Example 1"));
         results.push({{PrefixName}}::new("Example 2"));
-        results
+        Ok(results)
     }
 }
 

@@ -6,7 +6,10 @@ use {{ artifact_id }}_core::metrics;
 
 
 pub async fn {{ prefix_name  | pluralize }}(core: web::Data<{{ ArtifactId }}Core>) -> HttpResponse {
-    HttpResponse::Ok().json(core.get_{{ prefix_name  | pluralize }}().await)
+    match core.get_{{ prefix_name  | pluralize }}().await {
+        Ok(results) => HttpResponse::Ok().json(results),
+        Err(_) => HttpResponse::InternalServerError().finish(),
+    }
 }
 
 pub fn server_routes(config: &mut ServiceConfig) {
