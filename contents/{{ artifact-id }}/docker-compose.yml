@@ -1,6 +1,7 @@
 version: '2'
 services:
   server:
+    build: .
     image: {{ artifact-id }}:latest
     environment:
       {{ ARTIFACT_ID }}_DATABASE_URL: 'postgres://postgres:password@host.docker.internal/{{ artifact_id }}'

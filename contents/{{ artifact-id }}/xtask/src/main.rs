@@ -8,23 +8,26 @@ fn main() {
         .setting(AppSettings::ColoredHelp)
         .subcommand(
             SubCommand::with_name("postgres")
-                .about("PostgreSQL Management")
+                .about("Dockerized PostgreSQL Management")
                 .subcommand(SubCommand::with_name("init")
-                        .about("Initialize a Docker PostgreSQL Instance"))
+                    .about("Create and Start a PostgreSQL Docker Container"))
                 .subcommand(SubCommand::with_name("kill")
-                    .about("Kill PostgreSQL Docker Instance"))
+                    .about("Kill PostgreSQL Docker Container"))
                 .subcommand(SubCommand::with_name("stop")
-                    .about("Stops PostgreSQL Docker Instance"))
+                    .about("Stop PostgreSQL Docker Container"))
                 .subcommand(SubCommand::with_name("start")
-                    .about("Starts an existing PostgreSQL Docker Instance"))
+                    .about("Start an existing PostgreSQL Docker Container"))
                 .subcommand(SubCommand::with_name("rm")
-                    .about("Removes an existing PostgreSQL Docker Instance"))
+                    .about("Remove an existing PostgreSQL Docker Container"))
         )
         .subcommand(
             SubCommand::with_name("docker")
                 .about("Docker Operations")
                 .subcommand(SubCommand::with_name("build")
-                        .about("Builds a Docker images.")
+                    .about("Builds an application Docker image.")
+                )
+                .subcommand(SubCommand::with_name("rmi")
+                    .about("Removes the application Docker image.")
                 )
         )
         .get_matches();
@@ -32,7 +35,7 @@ fn main() {
     match args.subcommand() {
         ("postgres", Some(args)) => handle_postgres_commands(args),
         ("docker", Some(args)) => handle_docker_commands(args),
-        _ => {}
+        (command, _) => eprintln!("Unhandled command: {}", command),
     }
 }
 
@@ -46,6 +49,7 @@ fn handle_postgres_commands(args: &ArgMatches) {
 fn handle_docker_commands(args: &ArgMatches) {
     match args.subcommand() {
         ("build", _) => docker_build(),
+        ("rmi", _) => docker_rmi(),
         _ => (),
     }
 }
@@ -58,6 +62,14 @@ fn docker_build() {
         .spawn()
         .expect("Error spawning docker build")
         .wait().expect("Error executing docker build");
+}
+
+fn docker_rmi() {
+    Command::new("docker")
+        .arg("rmi")
+        .arg("foo-service")
+        .spawn().expect("Error spawning docker rmi")
+        .wait().expect("Error waiting for docker rmi");
 }
 
 fn postgres_init() {
