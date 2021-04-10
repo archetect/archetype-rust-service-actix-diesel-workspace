@@ -4,6 +4,8 @@ use std::process::Command;
 fn main() {
     let args = App::new(clap::crate_name!())
         .setting(AppSettings::SubcommandRequiredElseHelp)
+        .setting(AppSettings::VersionlessSubcommands)
+        .setting(AppSettings::ColoredHelp)
         .subcommand(
             SubCommand::with_name("postgres")
                 .about("PostgreSQL Management")
