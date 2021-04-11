@@ -1,10 +1,28 @@
 version: '2'
 services:
-  server:
+  {{ artifact-id }}:
     build: .
     image: {{ artifact-id }}:latest
     environment:
       {{ ARTIFACT_ID }}_DATABASE_URL: 'postgres://postgres:password@host.docker.internal/{{ artifact_id }}'
     ports:
+      - "8080"
+      - "8081"
+    networks:
+      - soa
+
+  {{ artifact-id }}-lb:
+    image: nginx:latest
+    volumes:
+      - ./.support/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - {{ artifact-id }}
+    ports:
       - "{{ server-port }}:8080"
-      - "{{ management-port }}:8081"
+    networks:
+      - soa
+
+networks:
+  soa:
+    driver: bridge
+    name: soa

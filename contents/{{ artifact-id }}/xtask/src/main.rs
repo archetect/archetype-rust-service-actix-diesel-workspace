@@ -79,6 +79,7 @@ fn postgres_init() {
         .arg("-p").arg("5432:5432")
         .arg("--name").arg("postgres-xtask")
         .arg("-d").arg("postgres")
+        .arg("-N").arg("1000")
         .spawn()
         .expect("Error Spawning postgres docker container")
         .wait().expect("Error Executing postgres docker container")
