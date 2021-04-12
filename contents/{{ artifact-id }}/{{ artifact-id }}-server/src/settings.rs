@@ -1,41 +1,53 @@
 use config::{Config, ConfigError, Environment, File, Source, Value};
 
-use order_service_persistence::settings::DatabaseSettings;
+use {{ artifact_id }}_persistence::settings::DatabaseSettings;
 use serde::{Deserialize, Serialize};
 use clap::ArgMatches;
 use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
-    pub server: ServerSettings,
-    pub management: ManagementSettings,
-    pub database: DatabaseSettings,
+    server: ServerSettings,
+    management: ManagementSettings,
+    database: DatabaseSettings,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServerSettings {
-    pub port: u16,
+    port: u16,
+}
+
+impl ServerSettings {
+    pub fn port(&self) -> u16 {
+        self.port
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ManagementSettings {
-    pub port: Option<u16>,
+    port: u16,
 }
 
-static DEFAULT_CONFIG_FILE: &str = "etc/order-service";
+impl ManagementSettings {
+    pub fn port(&self) -> u16 {
+        self.port
+    }
+}
+
+static DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
 
 impl Settings {
     pub fn new(args: &ArgMatches<'static>) -> Result<Self, ConfigError> {
         let mut config = Config::new();
 
         // Defaults
-        config.set("database.url", "postgres://postgres:password@localhost/order_service");
+        config.set("database.url", "postgres://postgres:password@localhost/{{ artifact_id }}")?;
         
         config.merge(File::with_name(DEFAULT_CONFIG_FILE).required(false))?;
         if let Ok(runtime_env) = std::env::var("RUNTIME_ENV") {
             config.merge(File::with_name(format!("{}-{}", DEFAULT_CONFIG_FILE, runtime_env).as_str()))?;
         }
-        config.merge(Environment::with_prefix("ORDER_SERVICE"))?;
+        config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}"))?;
 
         let mut mappings = HashMap::new();
         mappings.insert("server-port".into(), "server.port".into());

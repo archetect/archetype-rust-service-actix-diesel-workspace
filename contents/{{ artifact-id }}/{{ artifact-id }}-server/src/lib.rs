@@ -10,6 +10,7 @@ use {{ artifact_id }}_core::{{ ArtifactId }}Core;
 
 mod routes;
 mod metrics;
+pub mod settings;
 
 pub struct {{ ArtifactId }}Server {
     server_port: u16,
@@ -62,6 +63,14 @@ impl Builder {
     pub fn with_host<T: Into<String>>(mut self, host: T) -> Self {
         self.host = host.into();
         self
+    }
+    
+    pub fn with_server_settings(self, settings: &settings::ServerSettings) -> Self {
+        self.with_server_port(settings.port())
+    }
+
+    pub fn with_management_settings(self, settings: &settings::ManagementSettings) -> Self {
+        self.with_management_port(settings.port())
     }
 
     pub fn with_server_port(mut self, server_port: u16) -> Self {

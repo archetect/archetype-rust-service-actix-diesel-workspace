@@ -7,6 +7,7 @@ use std::env;
 
 pub mod models;
 pub mod schema;
+pub mod settings;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 pub type PgPooledConnection = PooledConnection<ConnectionManager<PgConnection>>;

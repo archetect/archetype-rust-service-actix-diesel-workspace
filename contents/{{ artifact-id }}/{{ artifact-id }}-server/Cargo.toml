@@ -12,14 +12,18 @@ path = "src/main.rs"
 [dependencies]
 {{ artifact-id }}-api = { path = "../{{ artifact-id }}-api" }
 {{ artifact-id }}-core = { path = "../{{ artifact-id }}-core" }
+{{ artifact-id }}-persistence = { path = "../{{ artifact-id }}-persistence" }
+
 actix-web = "3.3"
 actix-web-prom = "0.5"
 actix-cors = "0.5"
 atty = "0.2"
 clap = "2"
+config = { version = "0.11", default-features = false, features = ["yaml"] }
 dotenv = "0.15"
 futures = "0.3"
 prometheus = "0.11"
+serde = {version = "1.0", features = ["serde_derive"] }
 
 tracing = "0.1"
 tracing-futures = "0.2"
