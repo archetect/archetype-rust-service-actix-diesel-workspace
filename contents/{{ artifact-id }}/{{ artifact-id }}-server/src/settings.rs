@@ -66,7 +66,8 @@ impl Settings {
         
         config.merge(File::with_name(DEFAULT_CONFIG_FILE).required(false))?;
         if let Ok(runtime_env) = std::env::var("RUNTIME_ENV") {
-            config.merge(File::with_name(format!("{}-{}", DEFAULT_CONFIG_FILE, runtime_env).as_str()))?;
+            config.merge(File::with_name(format!("{}-{}", DEFAULT_CONFIG_FILE, runtime_env).as_str())
+                .required(false))?;
         }
         config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}"))?;
 

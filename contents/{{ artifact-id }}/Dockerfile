@@ -42,6 +42,7 @@ RUN apt-get update -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/target/release/{{ artifact-id }} {{ artifact-id }}
+COPY .support/docker/{{ artifact-id }} .
 ENV LOG_FORMAT bunyan
 ENV {{ ARTIFACT_ID}}_SERVER_PORT 8080
 ENV {{ ARTIFACT_ID}}_MANAGEMENT_PORT 8081

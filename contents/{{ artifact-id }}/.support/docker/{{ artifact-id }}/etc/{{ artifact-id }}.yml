@@ -1,0 +1,11 @@
+---
+server:
+  host: 0.0.0.0
+  service:
+    port: 8080
+  management:
+    port: 8081
+    
+persistence:
+  database:
+    url: postgres://postgres:password@host.docker.internal/{{ artifact-id }}

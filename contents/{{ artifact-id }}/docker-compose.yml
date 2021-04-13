@@ -5,6 +5,7 @@ services:
     image: {{ artifact-id }}:latest
     environment:
       {{ ARTIFACT_ID }}_DATABASE_URL: 'postgres://postgres:password@host.docker.internal/{{ artifact_id }}'
+      RUNTIME_ENV: DEV
     ports:
       - "8080"
       - "8081"
