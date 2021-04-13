@@ -57,6 +57,13 @@ pub fn app() -> App<'static, 'static> {
                 .case_insensitive(true)
         )
         .arg(
+            Arg::with_name("host")
+                .long("host")
+                .short("h")
+                .takes_value(true)
+                .help("The host the server listens on.")
+        )
+        .arg(
             Arg::with_name("server-port")
                 .short("p")
                 .long("server-port")
