@@ -1,6 +1,6 @@
 use config::{Config, ConfigError, Environment, File, Source, Value};
 
-use {{ artifact_id }}_persistence::settings::DatabaseSettings;
+use {{ artifact_id }}_persistence::settings::PersistenceSettings;
 use serde::{Deserialize, Serialize};
 use clap::ArgMatches;
 use std::collections::HashMap;
@@ -8,16 +8,31 @@ use std::collections::HashMap;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
     server: ServerSettings,
-    management: ManagementSettings,
-    database: DatabaseSettings,
+    persistence: PersistenceSettings,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServerSettings {
-    port: u16,
+    service: ServiceSettings,
+    management: ManagementSettings,
 }
 
 impl ServerSettings {
+    pub fn service(&self) -> &ServiceSettings {
+        &self.service
+    }
+
+    pub fn management(&self) -> &ManagementSettings {
+        &self.management
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ServiceSettings {
+    port: u16,
+}
+
+impl ServiceSettings {
     pub fn port(&self) -> u16 {
         self.port
     }
@@ -34,6 +49,7 @@ impl ManagementSettings {
     }
 }
 
+
 static DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
 
 impl Settings {
@@ -41,7 +57,7 @@ impl Settings {
         let mut config = Config::new();
 
         // Defaults
-        config.set("database.url", "postgres://postgres:password@localhost/{{ artifact_id }}")?;
+        config.merge(File::from_str(defaults(), config::FileFormat::Yaml))?;
         
         config.merge(File::with_name(DEFAULT_CONFIG_FILE).required(false))?;
         if let Ok(runtime_env) = std::env::var("RUNTIME_ENV") {
@@ -61,13 +77,13 @@ impl Settings {
         &self.server
     }
 
-    pub fn management(&self) -> &ManagementSettings {
-        &self.management
+    pub fn persistence(&self) -> &PersistenceSettings {
+        &self.persistence
     }
+}
 
-    pub fn database(&self) -> &DatabaseSettings {
-        &self.database
-    }
+pub fn defaults() -> &'static str {
+    include_str!("settings.yml")
 }
 
 #[derive(Clone, Debug)]

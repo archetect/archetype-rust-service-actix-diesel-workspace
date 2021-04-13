@@ -1,0 +1,9 @@
+server:
+  service:
+    port: {{ server-port }}
+  management:
+    port: {{ management-port }}
+
+persistence:
+  database:
+    url: postgres://postgres:password@localhost/{{ artifact_id }}

@@ -18,8 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     {{ ArtifactId }}Server::new(service_core)
         .with_host("0.0.0.0")
-        .with_server_settings(config.server())
-        .with_management_settings(config.management())
+        .with_settings(config.server())
         .with_cors_permissive(cli::is_cors_permissive(&matches))
         .build()?
         .run()
