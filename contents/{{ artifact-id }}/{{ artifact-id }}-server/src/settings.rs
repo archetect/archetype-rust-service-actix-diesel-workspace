@@ -65,6 +65,12 @@ impl Settings {
         }
         config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}"))?;
 
+        // Merge in a config file specified on the command line
+        if let Some(config_file) = args.value_of("config") {
+            config.merge(File::with_name(config_file).required(true))?;
+        }
+
+        // Merge in command line overrides
         let mut mappings = HashMap::new();
         mappings.insert("server-port".into(), "server.service.port".into());
         mappings.insert("management-port".into(), "server.management.port".into());

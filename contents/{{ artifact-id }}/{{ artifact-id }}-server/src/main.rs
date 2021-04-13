@@ -8,9 +8,21 @@ mod logging;
 
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let matches = cli::app().get_matches();
-    let config = settings::Settings::new(&matches)?;
-    logging::init(&matches);
+    let args = cli::app().get_matches();
+    let settings = settings::Settings::new(&args)?;
+    logging::init(&args);
+
+    match args.subcommand() {
+        ("settings", Some(subargs)) => {
+            match subargs.subcommand() {
+                ("defaults", _) => println!("{}", settings::defaults()),
+                ("merged", _) => println!("{}", serde_yaml::to_string(&settings)?),
+                (_, _) => (), // Unreachable
+            }
+            return Ok(());
+        },
+        (_, _) => (), // Unreachable
+    }
 
     debug!("Initializing...");
 
@@ -18,8 +30,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     {{ ArtifactId }}Server::new(service_core)
         .with_host("0.0.0.0")
-        .with_settings(config.server())
-        .with_cors_permissive(cli::is_cors_permissive(&matches))
+        .with_settings(settings.server())
+        .with_cors_permissive(cli::is_cors_permissive(&args))
         .build()?
         .run()
         .await?;

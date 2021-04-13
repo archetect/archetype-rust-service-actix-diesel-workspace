@@ -1,5 +1,5 @@
-use clap::{crate_authors, crate_description, crate_name, crate_version, arg_enum, ArgMatches};
-use clap::{App, Arg};
+use clap::{crate_authors, crate_description, crate_name, crate_version, arg_enum};
+use clap::{App, Arg, SubCommand, ArgMatches, AppSettings};
 
 arg_enum! {
     #[derive(PartialEq, Debug)]
@@ -19,6 +19,20 @@ pub fn app() -> App<'static, 'static> {
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
+        .setting(AppSettings::VersionlessSubcommands)
+        .subcommand(
+            SubCommand::with_name("settings")
+                .setting(AppSettings::SubcommandRequiredElseHelp)
+                .subcommand(
+                    SubCommand::with_name("defaults")
+                        .help("Displays the default settings")
+                )
+                .subcommand(
+                    SubCommand::with_name("merged")
+                        .help("Displays the effective settings from all merged sources.")
+                )
+                .help("Display Settings")
+        )
         .arg(
             Arg::with_name("verbosity")
                 .short("v")
@@ -26,6 +40,13 @@ pub fn app() -> App<'static, 'static> {
                 .multiple(true)
                 .global(true)
                 .help("Increases the level of verbosity"),
+        )
+        .arg(
+            Arg::with_name("config")
+                .help("Specifies additional configuration to merge.")
+                .long("config")
+                .short("c")
+                .takes_value(true)
         )
         .arg(
             Arg::with_name("log-format")
@@ -59,30 +80,11 @@ pub fn app() -> App<'static, 'static> {
                 .long_help("Configures a Permissive Cors Configuration for local development purposes.\
                     \nNever use in production!")
         )
-        .arg(
-            Arg::with_name("cors-permissive-env")
-                .env("CORS_PERMISSIVE")
-                .help("Permissive Cors Configuration via Environment Variable")
-                .long_help("Configures a Permissive Cors Configuration for local development purposes via Environment Variable.\
-                    \nNever use in production!")
-        )
 }
 
 
 pub fn is_cors_permissive(matches: &ArgMatches) -> bool {
-    // The cors-permissive flag takes precedence
-    if matches.is_present("cors-permissive") {
-        return true;
-    }
-    // If CORS_PERMISSIVE environment variable has been set to anything other than false
-    matches.value_of("cors-permissive-env")
-        .map_or(false, |value| {
-            if let Ok(value) = value.parse::<bool>() {
-                value
-            } else {
-                true
-            }
-        }, )
+    matches.is_present("cors-permissive")
 }
 
 fn is_valid_port(value: String) -> Result<(), String> {
