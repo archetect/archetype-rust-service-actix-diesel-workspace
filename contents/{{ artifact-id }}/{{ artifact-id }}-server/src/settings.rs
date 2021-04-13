@@ -66,8 +66,8 @@ impl Settings {
         config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}"))?;
 
         let mut mappings = HashMap::new();
-        mappings.insert("server-port".into(), "server.port".into());
-        mappings.insert("management-port".into(), "management.port".into());
+        mappings.insert("server-port".into(), "server.service.port".into());
+        mappings.insert("management-port".into(), "server.management.port".into());
         config.merge(Clap::new(args.clone(), mappings))?;
 
         config.try_into()
