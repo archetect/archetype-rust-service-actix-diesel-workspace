@@ -1,5 +1,6 @@
 ---
 server:
+  host: 0.0.0.0
   service:
     port: {{ server-port }}
   management:

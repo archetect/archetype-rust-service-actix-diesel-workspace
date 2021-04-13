@@ -13,11 +13,16 @@ pub struct Settings {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServerSettings {
+    host: String,
     service: ServiceSettings,
     management: ManagementSettings,
 }
 
 impl ServerSettings {
+    pub fn host(&self) -> &str {
+        self.host.as_str()
+    }
+    
     pub fn service(&self) -> &ServiceSettings {
         &self.service
     }

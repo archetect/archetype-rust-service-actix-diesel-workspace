@@ -29,7 +29,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let service_core = {{ ArtifactId }}Core::new();
 
     {{ ArtifactId }}Server::new(service_core)
-        .with_host("0.0.0.0")
         .with_settings(settings.server())
         .with_cors_permissive(cli::is_cors_permissive(&args))
         .build()?

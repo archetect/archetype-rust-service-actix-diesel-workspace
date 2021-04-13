@@ -66,7 +66,8 @@ impl Builder {
     }
 
     pub fn with_settings(self, settings: &settings::ServerSettings) -> Self {
-        self.with_server_port(settings.service().port())
+        self.with_host(settings.host())
+            .with_server_port(settings.service().port())
             .with_management_port(settings.management().port())
     }
 
