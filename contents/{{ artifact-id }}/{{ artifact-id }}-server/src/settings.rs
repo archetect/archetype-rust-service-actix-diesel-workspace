@@ -108,7 +108,7 @@ impl Settings {
 
         // Merge in command line overrides
         let mut mappings = HashMap::new();
-        mappings.insert("server-port".into(), "server.service.port".into());
+        mappings.insert("service-port".into(), "server.service.port".into());
         mappings.insert("management-port".into(), "server.management.port".into());
         mappings.insert("host".into(), "server.host".into());
         config.merge(Clap::new(args.clone(), mappings))?;

@@ -19,7 +19,7 @@ services:
     depends_on:
       - {{ artifact-id }}
     ports:
-      - "{{ server-port }}:8080"
+      - "{{ service-port }}:8080"
     networks:
       - soa
 

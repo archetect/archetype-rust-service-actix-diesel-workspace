@@ -10,16 +10,16 @@ pub async fn init_logging() {
 
 pub async fn start_server() -> Result<ServerTestContext, Box<dyn std::error::Error>> {
     let server = {{ ArtifactId }}Server::new({{ ArtifactId }}Core::new())
-        .with_random_server_port()
+        .with_random_service_port()
         .build().unwrap();
 
-    let server_port = server.service_port();
+    let service_port = server.service_port();
 
     actix_rt::spawn(async {
         let _ = server.run().await;
     });
 
-    let root_url = format!("http://localhost:{}", server_port);
+    let root_url = format!("http://localhost:{}", service_port);
     let root_url = reqwest::Url::parse(root_url.as_str())?;
 
     Ok(ServerTestContext {

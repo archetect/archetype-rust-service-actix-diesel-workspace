@@ -17,14 +17,14 @@ script:
         prompt: 'Author (Full):'
       author:
         prompt: 'Author (Short):'
-      server-port:
-        prompt: "Server Port:"
+      service-port:
+        prompt: "Service Port:"
         type: int
         default: "8080"
       management-port:
         prompt: "Management Port:"
         type: int
-        default: "{{ server-port + 1 }}"
+        default: "{{ service-port + 1 }}"
 
       # Derived Variables
       prefix-name:

@@ -7,14 +7,14 @@ use tracing::warn;
 use tracing_actix_web::TracingLogger;
 
 use {{ artifact_id }}_core::{{ ArtifactId }}Core;
-use crate::settings::{Settings, ServerSettings};
+use crate::settings::ServerSettings;
 
 mod routes;
 mod metrics;
 pub mod settings;
 
 pub struct {{ ArtifactId }}Server {
-    server_port: u16,
+    service_port: u16,
     service_server: Server,
     management_port: u16,
     management_server: Option<Server>,
@@ -22,11 +22,11 @@ pub struct {{ ArtifactId }}Server {
 
 impl {{ ArtifactId }}Server {
     pub fn new(service_core: {{ ArtifactId }}Core) -> Builder {
-        Builder::new(service_core,  &Settings::default().server())
+        Builder::new(service_core,  &ServerSettings::default())
     }
 
     pub fn service_port(&self) -> u16 {
-        self.server_port
+        self.service_port
     }
 
     pub fn management_port(&self) -> u16 {
@@ -44,7 +44,7 @@ impl {{ ArtifactId }}Server {
 
 pub struct Builder {
     host: String,
-    server_port: u16,
+    service_port: u16,
     management_port: Option<u16>,
     service_core: {{ ArtifactId }}Core,
     cors_permissive: bool,
@@ -54,7 +54,7 @@ impl Builder {
     fn new(core: {{ ArtifactId }}Core, settings: &ServerSettings) -> Self {
         Builder {
             host: settings.host().to_owned(),
-            server_port: settings.service().port(),
+            service_port: settings.service().port(),
             management_port: Some(settings.management().port()),
             service_core: core,
             cors_permissive: false,
@@ -68,17 +68,17 @@ impl Builder {
 
     pub fn with_settings(self, settings: &settings::ServerSettings) -> Self {
         self.with_host(settings.host())
-            .with_server_port(settings.service().port())
+            .with_service_port(settings.service().port())
             .with_management_port(settings.management().port())
     }
 
-    pub fn with_server_port(mut self, server_port: u16) -> Self {
-        self.server_port = server_port;
+    pub fn with_service_port(mut self, service_port: u16) -> Self {
+        self.service_port = service_port;
         self
     }
     
-    pub fn with_random_server_port(mut self) -> Self {
-        self.server_port = 0;
+    pub fn with_random_service_port(mut self) -> Self {
+        self.service_port = 0;
         self
     }
 
@@ -97,16 +97,16 @@ impl Builder {
 
         let host = &self.host;
 
-        let service_listener = TcpListener::bind((host.as_str(), self.server_port))?;
-        let server_port = service_listener.local_addr().unwrap().port();
+        let service_listener = TcpListener::bind((host.as_str(), self.service_port))?;
+        let service_port = service_listener.local_addr().unwrap().port();
 
         let management_port = if let Some(management_port) = self.management_port {
             management_port
         } else {
-            server_port
+            service_port
         };
 
-        let separate_management_port = (server_port != management_port) && self.server_port != 0;
+        let separate_management_port = (service_port != management_port) && self.service_port != 0;
 
         let server_metrics = if separate_management_port {
             metrics::server_metrics()
@@ -159,7 +159,7 @@ impl Builder {
         };
 
         Ok({{ ArtifactId }}Server {
-            server_port,
+            service_port,
             service_server,
             management_port,
             management_server,

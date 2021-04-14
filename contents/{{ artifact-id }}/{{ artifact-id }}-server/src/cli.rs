@@ -64,12 +64,12 @@ pub fn app() -> App<'static, 'static> {
                 .help("The host the server listens on.")
         )
         .arg(
-            Arg::with_name("server-port")
+            Arg::with_name("service-port")
                 .short("p")
-                .long("server-port")
+                .long("service-port")
                 .takes_value(true)
                 .validator(is_valid_port)
-                .help("Server Port")
+                .help("Service Port")
         )
         .arg(
             Arg::with_name("management-port")
