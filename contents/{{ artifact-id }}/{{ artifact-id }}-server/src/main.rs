@@ -15,8 +15,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match args.subcommand() {
         ("settings", Some(subargs)) => {
             match subargs.subcommand() {
-                ("defaults", _) => println!("{}", settings::defaults()),
-                ("merged", _) => println!("{}", serde_yaml::to_string(&settings)?),
+                ("defaults", _) => println!("{}", settings::Settings::default().to_yaml()?),
+                ("merged", _) => println!("{}", &settings.to_yaml()?),
                 (_, _) => (), // Unreachable
             }
             return Ok(());

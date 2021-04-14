@@ -13,7 +13,7 @@ pub async fn start_server() -> Result<ServerTestContext, Box<dyn std::error::Err
         .with_random_server_port()
         .build().unwrap();
 
-    let server_port = server.server_port();
+    let server_port = server.service_port();
 
     actix_rt::spawn(async {
         let _ = server.run().await;

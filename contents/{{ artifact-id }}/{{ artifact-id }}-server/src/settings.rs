@@ -11,6 +11,15 @@ pub struct Settings {
     persistence: PersistenceSettings,
 }
 
+impl Default for Settings {
+    fn default() -> Self {
+        Settings {
+            server: Default::default(),
+            persistence: Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServerSettings {
     host: String,
@@ -32,6 +41,16 @@ impl ServerSettings {
     }
 }
 
+impl Default for ServerSettings {
+    fn default() -> Self {
+        ServerSettings {
+            host: String::from("0.0.0.0"),
+            service: Default::default(),
+            management: Default::default()
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ServiceSettings {
     port: u16,
@@ -40,6 +59,12 @@ pub struct ServiceSettings {
 impl ServiceSettings {
     pub fn port(&self) -> u16 {
         self.port
+    }
+}
+
+impl Default for ServiceSettings {
+    fn default() -> Self {
+        ServiceSettings { port: 8080 }
     }
 }
 
@@ -54,15 +79,20 @@ impl ManagementSettings {
     }
 }
 
+impl Default for ManagementSettings {
+    fn default() -> Self {
+        ManagementSettings { port: 8081 }
+    }
+}
 
 static DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
 
 impl Settings {
-    pub fn new(args: &ArgMatches<'static>) -> Result<Self, ConfigError> {
+    pub fn new(args: &ArgMatches<'static>) -> Result<Self, Box<dyn std::error::Error>> {
         let mut config = Config::new();
 
         // Defaults
-        config.merge(File::from_str(defaults(), config::FileFormat::Yaml))?;
+        config.merge(File::from_str(Settings::default().to_yaml()?.as_str(), config::FileFormat::Yaml))?;
         
         config.merge(File::with_name(DEFAULT_CONFIG_FILE).required(false))?;
         if let Ok(runtime_env) = std::env::var("RUNTIME_ENV") {
@@ -83,7 +113,7 @@ impl Settings {
         mappings.insert("host".into(), "server.host".into());
         config.merge(Clap::new(args.clone(), mappings))?;
 
-        config.try_into()
+        config.try_into().map_err(|e| e.into())
     }
 
     pub fn server(&self) -> &ServerSettings {
@@ -93,10 +123,10 @@ impl Settings {
     pub fn persistence(&self) -> &PersistenceSettings {
         &self.persistence
     }
-}
 
-pub fn defaults() -> &'static str {
-    include_str!("settings.yml")
+    pub fn to_yaml(&self) -> Result<String, serde_yaml::Error> {
+        serde_yaml::to_string(self)
+    }
 }
 
 #[derive(Clone, Debug)]

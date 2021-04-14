@@ -7,6 +7,7 @@ use tracing::warn;
 use tracing_actix_web::TracingLogger;
 
 use {{ artifact_id }}_core::{{ ArtifactId }}Core;
+use crate::settings::{Settings, ServerSettings};
 
 mod routes;
 mod metrics;
@@ -21,10 +22,10 @@ pub struct {{ ArtifactId }}Server {
 
 impl {{ ArtifactId }}Server {
     pub fn new(service_core: {{ ArtifactId }}Core) -> Builder {
-        Builder::new(8080, service_core )
+        Builder::new(service_core,  &Settings::default().server())
     }
 
-    pub fn server_port(&self) -> u16 {
+    pub fn service_port(&self) -> u16 {
         self.server_port
     }
 
@@ -50,12 +51,12 @@ pub struct Builder {
 }
 
 impl Builder {
-    fn new(server_port: u16, service_core: {{ ArtifactId }}Core) -> Self {
+    fn new(core: {{ ArtifactId }}Core, settings: &ServerSettings) -> Self {
         Builder {
-            host: "127.0.0.1".into(),
-            server_port,
-            management_port: None,
-            service_core,
+            host: settings.host().to_owned(),
+            server_port: settings.service().port(),
+            management_port: Some(settings.management().port()),
+            service_core: core,
             cors_permissive: false,
         }
     }
