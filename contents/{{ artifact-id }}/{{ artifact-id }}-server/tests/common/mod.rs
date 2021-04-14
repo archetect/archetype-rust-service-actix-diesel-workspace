@@ -25,7 +25,7 @@ pub async fn start_server() -> Result<ServerTestContext, Box<dyn std::error::Err
     Ok(ServerTestContext {
         reqwest: reqwest::Client::new(),
         client: {{ ArtifactId }}Client::new(root_url.clone())?,
-        server_endpoint: root_url.clone(),
+        service_endpoint: root_url.clone(),
         management_endpoint: root_url,
     })
 }
@@ -34,7 +34,7 @@ pub async fn start_server() -> Result<ServerTestContext, Box<dyn std::error::Err
 pub struct ServerTestContext {
     reqwest: reqwest::Client,
     client: {{ ArtifactId }}Client,
-    server_endpoint: reqwest::Url,
+    service_endpoint: reqwest::Url,
     management_endpoint: reqwest::Url,
 }
 
@@ -49,7 +49,7 @@ impl ServerTestContext {
     }
 
     pub fn get<T: Into<String>>(&self, path: T) -> Result<RequestBuilder, Box<dyn std::error::Error>> {
-        Ok(self.reqwest().get(self.server_endpoint.join(path.into().as_str())?))
+        Ok(self.reqwest().get(self.service_endpoint.join(path.into().as_str())?))
     }
 
     pub fn get_management_path<T: Into<String>>(&self, path: T) -> Result<RequestBuilder, Box<dyn std::error::Error>> {
