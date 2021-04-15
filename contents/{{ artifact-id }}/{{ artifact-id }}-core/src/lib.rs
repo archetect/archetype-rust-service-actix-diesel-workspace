@@ -1,25 +1,27 @@
 use async_trait::async_trait;
-use tracing::{trace};
+use tracing::trace;
 
 use {{ artifact_id }}_api::{{ArtifactId}};
 use {{ artifact_id }}_api::models::{{PrefixName}};
-use {{ artifact_id }}_persistence::{establish_connection, PgPool};
+use {{ artifact_id }}_persistence::{{ArtifactId}}Persistence;
 
 pub mod metrics;
 
 #[derive(Clone)]
 pub struct {{ ArtifactId }}Core {
-    pool: PgPool
+    persistence: {{ArtifactId}}Persistence,
 }
 
 impl {{ ArtifactId }}Core {
-    pub fn new() -> Self {
-        Self { pool: establish_connection() }
-    }
+pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+    Ok(Self {
+        persistence: {{ArtifactId}}Persistence::new()?,
+    })
+}
 
-    pub fn new_with_pool(pool: PgPool) -> Self {
-        Self { pool }
-    }
+pub fn new_with_persistence(persistence: {{ArtifactId}}Persistence) -> Self {
+    Self { persistence }
+}
 }
 
 #[async_trait]
@@ -37,7 +39,6 @@ pub fn get_greeting() -> &'static str {
     trace!("Preparing greeting");
     metrics::EXAMPLE_COUNTER.inc();
     "Hello"
-
 }
 
 #[cfg(test)]
@@ -49,4 +50,3 @@ mod tests {
         assert_eq!(get_greeting(), "Hello");
     }
 }
-

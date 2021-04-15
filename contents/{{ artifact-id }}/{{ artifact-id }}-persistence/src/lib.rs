@@ -2,8 +2,7 @@
 extern crate diesel;
 
 use diesel::pg::PgConnection;
-use diesel::r2d2::{ Pool, PooledConnection, ConnectionManager, PoolError };
-use std::env;
+use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 
 pub mod models;
 pub mod schema;
@@ -12,15 +11,29 @@ pub mod settings;
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 pub type PgPooledConnection = PooledConnection<ConnectionManager<PgConnection>>;
 
+#[derive(Clone)]
+pub struct {{ArtifactId}}Persistence {
+    pool: PgPool,
+}
+
+impl {{ArtifactId}}Persistence {
+    pub fn new() -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
+        {{ArtifactId}}Persistence::new_with_settings(&settings::PersistenceSettings::default())
+    }
+
+    pub fn new_with_settings(
+        settings: &settings::PersistenceSettings,
+    ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
+        let pool = init_pool(settings.database().url())?;
+        Ok({{ArtifactId}}Persistence { pool })
+    }
+
+    pub fn pool(&self) -> &PgPool {
+        &self.pool
+    }
+}
+
 fn init_pool(database_url: &str) -> Result<PgPool, PoolError> {
     let manager = ConnectionManager::<PgConnection>::new(database_url);
     Pool::builder().build(manager)
-}
-
-pub fn establish_connection() -> PgPool {
-    dotenv::dotenv().ok();
-
-    let database_url = env::var("{{ ARTIFACT_ID }}_DATABASE_URL")
-        .expect("{{ ARTIFACT_ID }}_DATABASE_URL must be set");
-    init_pool(&database_url).expect("Error loading PgPool")
 }

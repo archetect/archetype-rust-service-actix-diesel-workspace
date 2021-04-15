@@ -8,4 +8,4 @@ server:
     
 persistence:
   database:
-    url: postgres://postgres:password@host.docker.internal/{{ artifact-id }}
+    url: postgres://postgres:password@host.docker.internal/{{ artifact_id }}

@@ -1,9 +1,10 @@
+use std::collections::HashMap;
+
+use clap::ArgMatches;
 use config::{Config, ConfigError, Environment, File, Source, Value};
+use serde::{Deserialize, Serialize};
 
 use {{ artifact_id }}_persistence::settings::PersistenceSettings;
-use serde::{Deserialize, Serialize};
-use clap::ArgMatches;
-use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
@@ -15,7 +16,7 @@ impl Default for Settings {
     fn default() -> Self {
         Settings {
             server: Default::default(),
-            persistence: Default::default()
+            persistence: Default::default(),
         }
     }
 }
@@ -31,7 +32,7 @@ impl ServerSettings {
     pub fn host(&self) -> &str {
         self.host.as_str()
     }
-    
+
     pub fn service(&self) -> &ServiceSettings {
         &self.service
     }
@@ -46,7 +47,7 @@ impl Default for ServerSettings {
         ServerSettings {
             host: String::from("0.0.0.0"),
             service: Default::default(),
-            management: Default::default()
+            management: Default::default(),
         }
     }
 }
@@ -88,34 +89,6 @@ impl Default for ManagementSettings {
 static DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
 
 impl Settings {
-    pub fn new(args: &ArgMatches<'static>) -> Result<Self, Box<dyn std::error::Error>> {
-        let mut config = Config::new();
-
-        // Defaults
-        config.merge(File::from_str(Settings::default().to_yaml()?.as_str(), config::FileFormat::Yaml))?;
-        
-        config.merge(File::with_name(DEFAULT_CONFIG_FILE).required(false))?;
-        if let Ok(runtime_env) = std::env::var("RUNTIME_ENV") {
-            config.merge(File::with_name(format!("{}-{}", DEFAULT_CONFIG_FILE, runtime_env).as_str())
-                .required(false))?;
-        }
-        config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}"))?;
-
-        // Merge in a config file specified on the command line
-        if let Some(config_file) = args.value_of("config") {
-            config.merge(File::with_name(config_file).required(true))?;
-        }
-
-        // Merge in command line overrides
-        let mut mappings = HashMap::new();
-        mappings.insert("service-port".into(), "server.service.port".into());
-        mappings.insert("management-port".into(), "server.management.port".into());
-        mappings.insert("host".into(), "server.host".into());
-        config.merge(Clap::new(args.clone(), mappings))?;
-
-        config.try_into().map_err(|e| e.into())
-    }
-
     pub fn server(&self) -> &ServerSettings {
         &self.server
     }
@@ -129,6 +102,39 @@ impl Settings {
     }
 }
 
+pub fn merge(args: &ArgMatches<'static>) -> Result<Settings, Box<dyn std::error::Error>> {
+    let mut config = Config::new();
+
+    // Defaults
+    config.merge(File::from_str(
+        Settings::default().to_yaml()?.as_str(),
+        config::FileFormat::Yaml,
+    ))?;
+
+    config.merge(File::with_name(DEFAULT_CONFIG_FILE).required(false))?;
+    if let Ok(runtime_env) = std::env::var("RUNTIME_ENV") {
+        config.merge(
+            File::with_name(format!("{}-{}", DEFAULT_CONFIG_FILE, runtime_env).as_str())
+                .required(false),
+        )?;
+    }
+    config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}").separator("_"))?;
+
+    // Merge in a config file specified on the command line
+    if let Some(config_file) = args.value_of("config") {
+        config.merge(File::with_name(config_file).required(true))?;
+    }
+
+    // Merge in command line overrides
+    let mut mappings = HashMap::new();
+    mappings.insert("service-port".into(), "server.service.port".into());
+    mappings.insert("management-port".into(), "server.management.port".into());
+    mappings.insert("host".into(), "server.host".into());
+    config.merge(Clap::new(args.clone(), mappings))?;
+
+    config.try_into().map_err(|e| e.into())
+}
+
 #[derive(Clone, Debug)]
 struct Clap {
     keys: HashMap<String, String>,
@@ -137,7 +143,10 @@ struct Clap {
 
 impl Clap {
     pub fn new(matches: ArgMatches<'static>, keys: HashMap<String, String>) -> Clap {
-        Clap { keys, matches: matches.clone() }
+        Clap {
+            keys,
+            matches: matches.clone(),
+        }
     }
 }
 
