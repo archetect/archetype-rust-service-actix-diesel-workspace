@@ -6,6 +6,11 @@ use serde::{Deserialize, Serialize};
 
 use {{ artifact_id }}_persistence::settings::PersistenceSettings;
 
+const DEFAULT_HOST: &str = "0.0.0.0";
+const DEFAULT_SERVICE_PORT: u16 = {{ service-port }};
+const DEFAULT_MANAGEMENT_PORT: u16 = {{ management-port }};
+const DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
     server: ServerSettings,
@@ -45,7 +50,7 @@ impl ServerSettings {
 impl Default for ServerSettings {
     fn default() -> Self {
         ServerSettings {
-            host: String::from("0.0.0.0"),
+            host: String::from(DEFAULT_HOST),
             service: Default::default(),
             management: Default::default(),
         }
@@ -65,7 +70,7 @@ impl ServiceSettings {
 
 impl Default for ServiceSettings {
     fn default() -> Self {
-        ServiceSettings { port: 8080 }
+        ServiceSettings { port: DEFAULT_SERVICE_PORT }
     }
 }
 
@@ -82,11 +87,9 @@ impl ManagementSettings {
 
 impl Default for ManagementSettings {
     fn default() -> Self {
-        ManagementSettings { port: 8081 }
+        ManagementSettings { port: DEFAULT_MANAGEMENT_PORT }
     }
 }
-
-static DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
 
 impl Settings {
     pub fn server(&self) -> &ServerSettings {

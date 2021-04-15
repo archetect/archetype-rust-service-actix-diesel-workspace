@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+const DEFAULT_DATABASE_URL: &str = "postgres://postgres:password@localhost/{{ artifact_id }}";
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PersistenceSettings {
     database: DatabaseSettings,
@@ -30,6 +32,6 @@ impl DatabaseSettings {
 
 impl Default for DatabaseSettings {
     fn default() -> Self {
-        DatabaseSettings { url: String::from("postgres://postgres:password@localhost/{{ artifact_id }}") }
+        DatabaseSettings { url: String::from(DEFAULT_DATABASE_URL) }
     }
 }
