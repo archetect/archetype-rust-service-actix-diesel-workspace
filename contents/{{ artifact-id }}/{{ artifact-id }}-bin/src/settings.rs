@@ -8,6 +8,7 @@ use {{ artifact_id }}_persistence::settings::PersistenceSettings;
 use {{ artifact_id }}_server::settings::ServerSettings;
 
 const DEFAULT_CONFIG_FILE: &str = "etc/{{ artifact-id }}";
+const DEFAULT_ENVIRONMENT_PREFIX: &str = "{{ ARTIFACT_ID }}";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Settings {
@@ -54,11 +55,13 @@ pub fn merge(args: &ArgMatches<'static>) -> Result<Settings, Box<dyn std::error:
                 .required(false),
         )?;
     }
-    config.merge(Environment::with_prefix("{{ ARTIFACT_ID }}").separator("_"))?;
+    config.merge(Environment::with_prefix(DEFAULT_ENVIRONMENT_PREFIX).separator("_"))?;
 
     // Merge in a config file specified on the command line
-    if let Some(config_file) = args.value_of("config") {
-        config.merge(File::with_name(config_file).required(true))?;
+    if let Some(config_file) = args.value_of("config-file") {
+        if let Ok(config_file) = shellexpand::full(config_file) {
+            config.merge(File::with_name(config_file.as_ref()).required(true))?;
+        }
     }
 
     // Merge in command line overrides

@@ -42,9 +42,9 @@ pub fn app() -> App<'static, 'static> {
                 .help("Increases the level of verbosity"),
         )
         .arg(
-            Arg::with_name("config")
+            Arg::with_name("config-file")
                 .help("Specifies additional configuration to merge.")
-                .long("config")
+                .long("config-file")
                 .short("c")
                 .takes_value(true)
         )
