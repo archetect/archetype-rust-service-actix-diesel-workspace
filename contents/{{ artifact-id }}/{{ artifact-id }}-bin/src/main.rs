@@ -2,10 +2,11 @@ use tracing::debug;
 
 use {{ artifact_id }}_core::{{ArtifactId}}Core;
 use {{ artifact_id }}_persistence::{{ArtifactId}}Persistence;
-use {{ artifact_id }}_server::{settings, {{ArtifactId}}Server};
+use {{ artifact_id }}_server::{{ArtifactId}}Server;
 
 mod cli;
 mod logging;
+mod settings;
 
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

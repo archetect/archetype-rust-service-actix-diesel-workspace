@@ -2,6 +2,7 @@
 
 members = [
     "{{ artifact-id }}-api",
+    "{{ artifact-id }}-bin",
     "{{ artifact-id }}-client",
     "{{ artifact-id }}-core",
     "{{ artifact-id }}-persistence",
@@ -10,5 +11,5 @@ members = [
 ]
 
 default-members = [
-    "{{ artifact-id }}-server",
+    "{{ artifact-id }}-bin",
 ]

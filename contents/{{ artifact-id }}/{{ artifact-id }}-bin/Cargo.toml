@@ -1,29 +1,38 @@
 [package]
-name = "{{ artifact-id }}-server"
+name = "{{ artifact-id }}-bin"
 version = "0.1.0"
 authors = ["{{ author_full }}"]
 edition = "2018"
+
+[[bin]]
+name = "{{ artifact-id }}"
+path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 {{ artifact-id }}-api = { path = "../{{ artifact-id }}-api" }
 {{ artifact-id }}-core = { path = "../{{ artifact-id }}-core" }
 {{ artifact-id }}-persistence = { path = "../{{ artifact-id }}-persistence" }
+{{ artifact-id }}-server = { path = "../{{ artifact-id }}-server" }
 
 actix-web = "3.3"
 actix-web-prom = "0.5"
 actix-cors = "0.5"
+atty = "0.2"
+clap = "2"
+config = { version = "0.11", default-features = false, features = ["yaml"] }
+dotenv = "0.15"
 futures = "0.3"
 prometheus = "0.11"
 serde = {version = "1.0", features = ["serde_derive"] }
+serde_yaml = "0.8"
 
 tracing = "0.1"
+tracing-futures = "0.2"
+tracing-subscriber = { version = "0.2", features = ["registry", "env-filter"] }
+tracing-bunyan-formatter = "0.1"
+tracing-log = "0.1"
 tracing-actix-web = "0.2"
-
-[dev-dependencies]
-{{ artifact-id }}-client = { path = "../{{ artifact-id }}-client" }
-actix-rt = "1"
-reqwest = { version = "0.10", default-features = false, features = ["rustls-tls", "json"] }
 
 [features]
 expensive_tests = []
