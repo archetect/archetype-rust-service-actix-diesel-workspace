@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate diesel;
 
+use url::Url;
+
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 
@@ -25,10 +27,13 @@ impl {{ArtifactId}}Persistence {
     pub fn new_with_settings(
         settings: &settings::PersistenceSettings,
     ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
-        tempdb::SCHEMA_MANAGER.with(|sm| {
-            sm.borrow_mut().add_schema(settings.database().url());
+        let database_url = Url::parse(settings.database().url()).unwrap();
+        tempdb::TEMP_DATABASES.with(|sm| {
+            let tempdb = tempdb::get_tempdb_url(&database_url);
+            sm.borrow_mut().add_database(tempdb);
         });
-        let pool = init_pool(settings.database().url())?;
+
+        let pool = init_pool(database_url.as_str())?;
         Ok({{ArtifactId}}Persistence { pool })
     }
 
