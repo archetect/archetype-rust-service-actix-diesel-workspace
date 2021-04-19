@@ -33,6 +33,22 @@ pub fn app() -> App<'static, 'static> {
                 )
                 .help("Display Settings")
         )
+        .subcommand(
+            SubCommand::with_name("database")
+                .setting(AppSettings::SubcommandRequiredElseHelp)
+                .help("Database Operations")
+                .about("Database Operations")
+                .subcommand(
+                    SubCommand::with_name("init")
+                        .about("Initialize Database")
+                        .help("Initialize Database")
+                )
+                .subcommand(
+                    SubCommand::with_name("migrate")
+                        .about("Run Database Migrations")
+                        .help("Run database migrations")
+                )
+        )
         .arg(
             Arg::with_name("verbosity")
                 .short("v")
