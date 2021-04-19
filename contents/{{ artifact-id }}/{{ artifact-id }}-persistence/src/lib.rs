@@ -9,7 +9,7 @@ use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 pub mod models;
 pub mod schema;
 pub mod settings;
-mod tempdb;
+pub mod tempdb;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 pub type PgPooledConnection = PooledConnection<ConnectionManager<PgConnection>>;
