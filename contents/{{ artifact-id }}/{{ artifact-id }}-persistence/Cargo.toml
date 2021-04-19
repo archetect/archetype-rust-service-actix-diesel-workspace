@@ -8,6 +8,7 @@ edition = "2018"
 [dependencies]
 chrono = "0.4"
 diesel = { version = "1.4", features = ["chrono", "postgres", "r2d2"] }
+diesel_migrations = "1.4"
 harsh = "0.2"
 serde = {version = "1.0", features = ["serde_derive"] }
 tracing = "0.1"

@@ -6,6 +6,8 @@ use crate::settings::{DatabaseSettings};
 use tracing::info;
 use url::Url;
 
+embed_migrations!();
+
 thread_local! {
     pub static TEMP_DATABASES: RefCell<TempDatabases> = RefCell::new(TempDatabases::new());
 }
@@ -29,6 +31,13 @@ pub fn create_database_if_not_exists(database_settings: &DatabaseSettings) -> Re
             eprintln!("'{}' database already exists", database_name);
         }
     }
+    Ok(())
+}
+
+pub fn database_migrate(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
+    let url = Url::parse(database_settings.url())?;
+    let conn = PgConnection::establish(url.as_str())?;
+    embedded_migrations::run(&conn)?;
     Ok(())
 }
 

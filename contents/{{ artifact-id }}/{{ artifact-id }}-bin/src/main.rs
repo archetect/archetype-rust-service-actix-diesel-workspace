@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ("database", Some(subargs)) => {
             match subargs.subcommand() {
                 ("init", _) => { tempdb::create_database_if_not_exists(&settings.persistence().database())? }
-                ("migrate", _) => unimplemented!(),
+                ("migrate", _) => {  tempdb::database_migrate(&settings.persistence().database())? },
                 (_, _) => (),
             }
             return Ok(())
