@@ -104,6 +104,14 @@ pub fn app() -> App<'static, 'static> {
                 .long_help("Configures a Permissive Cors Configuration for local development purposes.\
                     \nNever use in production!")
         )
+        .arg(
+            Arg::with_name("temp-database")
+                .long("temp-database")
+                .takes_value(true)
+                .possible_value("drop")
+                .possible_value("retain")
+                .help("Initialize and migrate a database appended with a dynamically generated suffix.")
+        )
 }
 
 

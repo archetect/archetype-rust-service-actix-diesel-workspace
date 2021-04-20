@@ -69,6 +69,7 @@ pub fn merge(args: &ArgMatches<'static>) -> Result<Settings, Box<dyn std::error:
     mappings.insert("service-port".into(), "server.service.port".into());
     mappings.insert("management-port".into(), "server.management.port".into());
     mappings.insert("host".into(), "server.host".into());
+    mappings.insert("temp-database".into(), "persistence.temporary".into());
     config.merge(Clap::new(args.clone(), mappings))?;
 
     config.try_into().map_err(|e| e.into())
