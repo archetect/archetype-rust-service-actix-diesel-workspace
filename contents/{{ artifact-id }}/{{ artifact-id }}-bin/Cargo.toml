@@ -1,5 +1,5 @@
 [package]
-name = "{{ artifact-id }}-bin"
+name = "{{ artifact-id }}"
 version = "0.1.0"
 authors = ["{{ author_full }}"]
 edition = "2018"

@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logging::init(&args);
 
     match args.subcommand() {
-        ("settings", Some(subargs)) => {
+        ("config", Some(subargs)) => {
             match subargs.subcommand() {
                 ("defaults", _) => println!("{}", settings::Settings::default().to_yaml()?),
                 ("merged", _) => println!("{}", &settings.to_yaml()?),

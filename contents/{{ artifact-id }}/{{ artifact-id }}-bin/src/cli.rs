@@ -21,8 +21,10 @@ pub fn app() -> App<'static, 'static> {
         .about(crate_description!())
         .setting(AppSettings::VersionlessSubcommands)
         .subcommand(
-            SubCommand::with_name("settings")
+            SubCommand::with_name("config")
                 .setting(AppSettings::SubcommandRequiredElseHelp)
+                .about("Configuration Operations")
+                .help("Configuration Operations")
                 .subcommand(
                     SubCommand::with_name("defaults")
                         .help("Displays the default settings")
@@ -31,7 +33,6 @@ pub fn app() -> App<'static, 'static> {
                     SubCommand::with_name("merged")
                         .help("Displays the effective settings from all merged sources.")
                 )
-                .help("Display Settings")
         )
         .subcommand(
             SubCommand::with_name("database")
