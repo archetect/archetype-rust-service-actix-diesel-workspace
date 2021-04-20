@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
+use url::Url;
 
 const DEFAULT_DATABASE_URL: &str = "postgres://postgres:password@localhost/{{ artifact_id }}";
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub enum TemporaryType {
     #[serde(rename = "drop")]
     Drop,
@@ -49,6 +50,11 @@ pub struct DatabaseSettings {
 impl DatabaseSettings {
     pub fn url(&self) -> &str {
         self.url.as_str()
+    }
+
+    pub fn with_url(mut self, url: &Url) -> Self {
+        self.url = url.to_string();
+        self
     }
 }
 

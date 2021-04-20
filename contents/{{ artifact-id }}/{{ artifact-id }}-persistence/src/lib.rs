@@ -7,6 +7,7 @@ use url::Url;
 
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
+use crate::settings::DatabaseSettings;
 
 pub mod models;
 pub mod schema;
@@ -29,11 +30,20 @@ impl {{ArtifactId}}Persistence {
     pub fn new_with_settings(
         settings: &settings::PersistenceSettings,
     ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
-        let database_url = Url::parse(settings.database().url()).unwrap();
-        tempdb::TEMP_DATABASES.with(|sm| {
-            let tempdb = tempdb::get_tempdb_url(&database_url);
-            sm.borrow_mut().add_database(tempdb);
-        });
+        let mut database_url = Url::parse(settings.database().url()).unwrap();
+
+        if let Some(temporary) = settings.tempdb() {
+            database_url = tempdb::get_tempdb_url(&database_url);
+            let temp_settings = DatabaseSettings::default().with_url(&database_url);
+            tempdb::create_database_if_not_exists(&temp_settings)?;
+            tempdb::database_migrate(&temp_settings)?;
+
+            if temporary == &settings::TemporaryType::Drop {
+                tempdb::TEMP_DATABASES.with(|sm| {
+                    sm.borrow_mut().add_database(database_url.clone());
+                });
+            }
+        }
 
         let pool = init_pool(database_url.as_str())?;
         Ok({{ArtifactId}}Persistence { pool })
