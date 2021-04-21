@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-const DEFAULT_DATABASE_URL: &str = "postgres://postgres:password@localhost/{{ artifact_id }}";
+const DEFAULT_DATABASE_URL: once_cell::unsync::Lazy<Url> = once_cell::unsync::Lazy::new(|| {
+    Url::parse("postgres://postgres:password@localhost/order_service").unwrap()
+});
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 pub enum TemporaryType {
@@ -44,22 +46,24 @@ impl Default for PersistenceSettings {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DatabaseSettings {
-    url: String,
+    url: Url,
 }
 
 impl DatabaseSettings {
-    pub fn url(&self) -> &str {
-        self.url.as_str()
+    pub fn url(&self) -> &Url {
+        &self.url
     }
 
     pub fn with_url(mut self, url: &Url) -> Self {
-        self.url = url.to_string();
+        self.url = url.clone();
         self
     }
 }
 
 impl Default for DatabaseSettings {
     fn default() -> Self {
-        DatabaseSettings { url: String::from(DEFAULT_DATABASE_URL) }
+        DatabaseSettings {
+            url: DEFAULT_DATABASE_URL.clone(),
+        }
     }
 }

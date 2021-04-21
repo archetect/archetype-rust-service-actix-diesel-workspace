@@ -21,10 +21,9 @@ table! {
     }
 }
 
-pub fn create_database_if_not_exists(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
-    let url = Url::parse(database_settings.url())?;
-    if let Some(database_name) = get_database_name(&url) {
-        let admin_url = get_admin_url(&url);
+pub fn init(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(database_name) = get_database_name(database_settings.url()) {
+        let admin_url = get_admin_url(database_settings.url());
         let conn = PgConnection::establish(admin_url.as_str())?;
         if !database_exists(&conn, &database_name)? {
             CreateDatabase::with_name(&database_name).execute(&conn)?;
@@ -36,9 +35,8 @@ pub fn create_database_if_not_exists(database_settings: &DatabaseSettings) -> Re
     Ok(())
 }
 
-pub fn database_migrate(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
-    let url = Url::parse(database_settings.url())?;
-    let conn = PgConnection::establish(url.as_str())?;
+pub fn migrate(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
+    let conn = PgConnection::establish(database_settings.url().as_str())?;
     embedded_migrations::run(&conn)?;
     Ok(())
 }
@@ -125,7 +123,7 @@ fn tempdb_id() -> String {
 }
 
 
-pub struct CreateDatabase {
+struct CreateDatabase {
     database_name: String,
 }
 
@@ -153,7 +151,7 @@ impl QueryId for CreateDatabase {
 }
 
 #[derive(Debug, Clone)]
-pub struct DropDatabase {
+struct DropDatabase {
     database_name: String,
 }
 

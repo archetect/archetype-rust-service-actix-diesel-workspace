@@ -6,7 +6,6 @@ extern crate diesel_migrations;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection, PoolError};
 use tracing::debug;
-use url::Url;
 
 use crate::settings::DatabaseSettings;
 
@@ -31,13 +30,13 @@ impl {{ArtifactId}}Persistence {
     pub fn new_with_settings(
         settings: &settings::PersistenceSettings,
     ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
-        let mut database_url = Url::parse(settings.database().url()).unwrap();
+        let mut database_url = settings.database().url().clone();
 
         if let Some(temporary) = settings.tempdb() {
             database_url = database::get_tempdb_url(&database_url);
             let temp_settings = DatabaseSettings::default().with_url(&database_url);
-            database::create_database_if_not_exists(&temp_settings)?;
-            database::database_migrate(&temp_settings)?;
+            database::init(&temp_settings)?;
+            database::migrate(&temp_settings)?;
 
             if temporary == &settings::TemporaryType::Drop {
                 database::TEMP_DATABASES.with(|sm| {
