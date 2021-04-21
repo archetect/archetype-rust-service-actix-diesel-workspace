@@ -3,10 +3,11 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
 
+use diesel::pg::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection, PoolError};
+use tracing::debug;
 use url::Url;
 
-use diesel::pg::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 use crate::settings::DatabaseSettings;
 
 pub mod models;
@@ -40,6 +41,7 @@ impl {{ArtifactId}}Persistence {
 
             if temporary == &settings::TemporaryType::Drop {
                 tempdb::TEMP_DATABASES.with(|sm| {
+                    debug!("Registering database for drop");
                     sm.borrow_mut().add_database(database_url.clone());
                 });
             }
