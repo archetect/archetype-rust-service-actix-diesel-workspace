@@ -32,7 +32,7 @@ impl {{ArtifactId}}Persistence {
     ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
         let mut database_url = settings.database().url().clone();
 
-        if let Some(temporary) = settings.tempdb() {
+        if let Some(temporary) = settings.temporary() {
             database_url = database::get_tempdb_url(&database_url);
             let temp_settings = DatabaseSettings::default().with_url(&database_url);
             database::init(&temp_settings)?;

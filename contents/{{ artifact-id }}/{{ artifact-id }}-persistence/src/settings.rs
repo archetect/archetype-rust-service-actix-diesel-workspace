@@ -1,8 +1,9 @@
+use once_cell::unsync::Lazy;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
-const DEFAULT_DATABASE_URL: once_cell::unsync::Lazy<Url> = once_cell::unsync::Lazy::new(|| {
-    Url::parse("postgres://postgres:password@localhost/order_service").unwrap()
+const DEFAULT_DATABASE_URL: Lazy<Url> = Lazy::new(|| {
+    Url::parse("postgres://postgres:password@localhost/{{ artifact_id }}").unwrap()
 });
 
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
@@ -21,11 +22,11 @@ pub struct PersistenceSettings {
 }
 
 impl PersistenceSettings {
-    pub fn tempdb(&self) -> Option<&TemporaryType> {
+    pub fn temporary(&self) -> Option<&TemporaryType> {
         self.temporary.as_ref()
     }
 
-    pub fn with_tempdb(mut self, tembdb_type: TemporaryType) -> PersistenceSettings {
+    pub fn with_temporary(mut self, tembdb_type: TemporaryType) -> PersistenceSettings {
         self.temporary = Some(tembdb_type);
         self
     }
