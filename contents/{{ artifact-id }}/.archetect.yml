@@ -1,0 +1,10 @@
+---
+answers:
+  prefix:
+    value: {{ prefix }}
+  suffix:
+    value: {{ suffix }}
+  service-port:
+    value: {{ service-port }}
+  management-port:
+    value: {{ management-port }}

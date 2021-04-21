@@ -13,7 +13,7 @@ use crate::settings::DatabaseSettings;
 pub mod models;
 pub mod schema;
 pub mod settings;
-pub mod tempdb;
+pub mod database;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 pub type PgPooledConnection = PooledConnection<ConnectionManager<PgConnection>>;
@@ -34,13 +34,13 @@ impl {{ArtifactId}}Persistence {
         let mut database_url = Url::parse(settings.database().url()).unwrap();
 
         if let Some(temporary) = settings.tempdb() {
-            database_url = tempdb::get_tempdb_url(&database_url);
+            database_url = database::get_tempdb_url(&database_url);
             let temp_settings = DatabaseSettings::default().with_url(&database_url);
-            tempdb::create_database_if_not_exists(&temp_settings)?;
-            tempdb::database_migrate(&temp_settings)?;
+            database::create_database_if_not_exists(&temp_settings)?;
+            database::database_migrate(&temp_settings)?;
 
             if temporary == &settings::TemporaryType::Drop {
-                tempdb::TEMP_DATABASES.with(|sm| {
+                database::TEMP_DATABASES.with(|sm| {
                     debug!("Registering database for drop");
                     sm.borrow_mut().add_database(database_url.clone());
                 });

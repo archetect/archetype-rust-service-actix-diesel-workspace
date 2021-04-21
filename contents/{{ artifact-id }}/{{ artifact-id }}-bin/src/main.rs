@@ -1,7 +1,7 @@
 use tracing::debug;
 
 use {{ artifact_id }}_core::{{ArtifactId}}Core;
-use {{ artifact_id }}_persistence::{tempdb, {{ArtifactId}}Persistence};
+use {{ artifact_id }}_persistence::{database, {{ArtifactId}}Persistence};
 use {{ artifact_id }}_server::{{ArtifactId}}Server;
 
 mod cli;
@@ -25,8 +25,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         ("database", Some(subargs)) => {
             match subargs.subcommand() {
-                ("init", _) => { tempdb::create_database_if_not_exists(&settings.persistence().database())? }
-                ("migrate", _) => {  tempdb::database_migrate(&settings.persistence().database())? },
+                ("init", _) => { database::create_database_if_not_exists(&settings.persistence().database())? }
+                ("migrate", _) => {  database::database_migrate(&settings.persistence().database())? },
                 (_, _) => (),
             }
             return Ok(())
