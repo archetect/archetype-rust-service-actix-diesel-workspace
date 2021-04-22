@@ -23,11 +23,7 @@ pub struct {{ArtifactId}}Persistence {
 }
 
 impl {{ArtifactId}}Persistence {
-    pub fn new() -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
-        {{ArtifactId}}Persistence::new_with_settings(&settings::PersistenceSettings::default())
-    }
-
-    pub fn new_with_settings(
+    pub fn new(
         settings: &settings::PersistenceSettings,
     ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
         let mut database_url = settings.database().url().clone();

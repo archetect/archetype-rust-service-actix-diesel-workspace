@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     debug!("Initializing...");
 
     let service_core = {{ArtifactId}}Core::new_with_persistence(
-        {{ArtifactId}}Persistence::new_with_settings(settings.persistence())?,
+        {{ArtifactId}}Persistence::new(settings.persistence())?,
     );
 
     {{ArtifactId}}Server::new(service_core)

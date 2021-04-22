@@ -4,6 +4,7 @@ use tracing::trace;
 use {{ artifact_id }}_api::{{ArtifactId}};
 use {{ artifact_id }}_api::models::{{PrefixName}};
 use {{ artifact_id }}_persistence::{{ArtifactId}}Persistence;
+use {{ artifact_id }}_persistence::settings::PersistenceSettings;
 
 pub mod metrics;
 
@@ -15,7 +16,7 @@ pub struct {{ ArtifactId }}Core {
 impl {{ ArtifactId }}Core {
 pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
     Ok(Self {
-        persistence: {{ArtifactId}}Persistence::new()?,
+        persistence: {{ArtifactId}}Persistence::new(&PersistenceSettings::default())?,
     })
 }
 
