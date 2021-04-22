@@ -70,6 +70,7 @@ pub fn merge(args: &ArgMatches<'static>) -> Result<Settings, Box<dyn std::error:
     mappings.insert("management-port".into(), "server.management.port".into());
     mappings.insert("host".into(), "server.host".into());
     mappings.insert("temp-database".into(), "persistence.temporary".into());
+    mappings.insert("database-url".into(), "persistence.database.url".into());
     config.merge(Clap::new(args.clone(), mappings))?;
 
     config.try_into().map_err(|e| e.into())

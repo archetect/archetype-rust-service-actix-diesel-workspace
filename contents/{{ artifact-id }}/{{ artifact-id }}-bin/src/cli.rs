@@ -13,7 +13,10 @@ arg_enum! {
 }
 
 pub fn app() -> App<'static, 'static> {
+    // Load Git-managed variables, which serve as defaults
     dotenv::dotenv().ok();
+    // Load developer-managed environment variables
+    dotenv::from_filename(".env.dev").ok();
 
     App::new(crate_name!())
         .version(crate_version!())
@@ -111,6 +114,12 @@ pub fn app() -> App<'static, 'static> {
                 .possible_value("drop")
                 .possible_value("retain")
                 .help("Initialize and migrate a database appended with a dynamically generated suffix.")
+        )
+        .arg(
+            Arg::with_name("database-url")
+                .long("database-url")
+                .takes_value(true)
+                .help("Sets the database url to connect to.")
         )
 }
 
