@@ -1,10 +1,12 @@
 use std::cell::RefCell;
+
 use diesel::*;
-use diesel::query_builder::{QueryFragment, AstPass, QueryId};
 use diesel::backend::Backend;
-use crate::settings::{DatabaseSettings};
+use diesel::query_builder::{AstPass, QueryFragment, QueryId};
 use tracing::info;
 use url::Url;
+
+use crate::settings::DatabaseSettings;
 
 embed_migrations!();
 
@@ -19,24 +21,22 @@ table! {
     }
 }
 
-pub fn create_database_if_not_exists(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
-    let url = Url::parse(database_settings.url())?;
-    if let Some(database_name) = get_database_name(&url) {
-        let admin_url = get_admin_url(&url);
+pub fn init(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(database_name) = get_database_name(database_settings.url()) {
+        let admin_url = get_admin_url(database_settings.url());
         let conn = PgConnection::establish(admin_url.as_str())?;
         if !database_exists(&conn, &database_name)? {
             CreateDatabase::with_name(&database_name).execute(&conn)?;
-            eprintln!("'{}' database created", database_name);
+            info!("'{}' database created", database_name);
         } else {
-            eprintln!("'{}' database already exists", database_name);
+            info!("'{}' database already exists", database_name);
         }
     }
     Ok(())
 }
 
-pub fn database_migrate(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
-    let url = Url::parse(database_settings.url())?;
-    let conn = PgConnection::establish(url.as_str())?;
+pub fn migrate(database_settings: &DatabaseSettings) -> Result<(), Box<dyn std::error::Error>> {
+    let conn = PgConnection::establish(database_settings.url().as_str())?;
     embedded_migrations::run(&conn)?;
     Ok(())
 }
@@ -77,7 +77,18 @@ impl Drop for TempDatabases {
     fn drop(&mut self) {
         for database_url in self.database_urls() {
             if let Some(database_name) = get_database_name(database_url) {
-                info!("Dropping Temp Database '{}'", database_name);
+                let admin_url = get_admin_url(database_url);
+                match PgConnection::establish(admin_url.as_str()) {
+                    Ok(conn) => {
+                        if let Err(err) = DropDatabase::with_name(&database_name).execute(&conn) {
+                            eprintln!("Failed to drop temp database '{}': {}", database_name, err);
+                        }
+                    }
+                    Err(error) => {
+                        eprintln!("Error establishing a connection while attempting to drop database '{}': {}",
+                                  database_name, error);
+                    }
+                }
             }
         }
     }
@@ -112,7 +123,7 @@ fn tempdb_id() -> String {
 }
 
 
-pub struct CreateDatabase {
+struct CreateDatabase {
     database_name: String,
 }
 
@@ -136,6 +147,35 @@ impl<Conn> RunQueryDsl<Conn> for CreateDatabase {}
 
 impl QueryId for CreateDatabase {
     type QueryId = ();
+    const HAS_STATIC_QUERY_ID: bool = false;
+}
+
+#[derive(Debug, Clone)]
+struct DropDatabase {
+    database_name: String,
+}
+
+impl DropDatabase {
+    pub fn with_name<T: Into<String>>(database_name: T) -> Self {
+        DropDatabase {
+            database_name: database_name.into(),
+        }
+    }
+}
+
+impl<DB: Backend> QueryFragment<DB> for DropDatabase {
+    fn walk_ast(&self, mut out: AstPass<DB>) -> QueryResult<()> {
+        out.push_sql("drop database ");
+        out.push_identifier(&self.database_name)?;
+        Ok(())
+    }
+}
+
+impl<Conn> RunQueryDsl<Conn> for DropDatabase {}
+
+impl QueryId for DropDatabase {
+    type QueryId = ();
+
     const HAS_STATIC_QUERY_ID: bool = false;
 }
 

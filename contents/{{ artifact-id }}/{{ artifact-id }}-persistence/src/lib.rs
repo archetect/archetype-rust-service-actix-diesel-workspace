@@ -3,16 +3,16 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
 
-use url::Url;
-
 use diesel::pg::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection, PoolError};
+use tracing::debug;
+
 use crate::settings::DatabaseSettings;
 
 pub mod models;
 pub mod schema;
 pub mod settings;
-pub mod tempdb;
+pub mod database;
 
 pub type PgPool = Pool<ConnectionManager<PgConnection>>;
 pub type PgPooledConnection = PooledConnection<ConnectionManager<PgConnection>>;
@@ -23,23 +23,20 @@ pub struct {{ArtifactId}}Persistence {
 }
 
 impl {{ArtifactId}}Persistence {
-    pub fn new() -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
-        {{ArtifactId}}Persistence::new_with_settings(&settings::PersistenceSettings::default())
-    }
-
-    pub fn new_with_settings(
+    pub fn new(
         settings: &settings::PersistenceSettings,
     ) -> Result<{{ArtifactId}}Persistence, Box<dyn std::error::Error>> {
-        let mut database_url = Url::parse(settings.database().url()).unwrap();
+        let mut database_url = settings.database().url().clone();
 
-        if let Some(temporary) = settings.tempdb() {
-            database_url = tempdb::get_tempdb_url(&database_url);
+        if let Some(temporary) = settings.temporary() {
+            database_url = database::get_tempdb_url(&database_url);
             let temp_settings = DatabaseSettings::default().with_url(&database_url);
-            tempdb::create_database_if_not_exists(&temp_settings)?;
-            tempdb::database_migrate(&temp_settings)?;
+            database::init(&temp_settings)?;
+            database::migrate(&temp_settings)?;
 
             if temporary == &settings::TemporaryType::Drop {
-                tempdb::TEMP_DATABASES.with(|sm| {
+                database::TEMP_DATABASES.with(|sm| {
+                    debug!("Registering database for drop");
                     sm.borrow_mut().add_database(database_url.clone());
                 });
             }

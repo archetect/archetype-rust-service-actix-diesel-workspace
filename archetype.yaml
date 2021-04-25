@@ -6,6 +6,14 @@ frameworks: [ "Actix Web", "Diesel", "Clap" ]
 tags: [ "Service", "Workspace" ]
 
 script:
+  - if:
+      conditions:
+        - switch-enabled: overwrite
+      then:
+        - rules:
+            - destination:
+                overwrite: true
+
   - set:
       #Prompted Variables
       prefix:
