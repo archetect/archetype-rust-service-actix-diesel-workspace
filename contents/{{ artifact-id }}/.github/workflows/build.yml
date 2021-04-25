@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install Rust Toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+
+    - name: Cargo Build
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+
+#    - name: Cargo Build
+#      uses: actions-rs/cargo@v1
+#      with:
+#        command: test
