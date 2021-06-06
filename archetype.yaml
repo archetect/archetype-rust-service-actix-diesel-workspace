@@ -3,7 +3,7 @@ description: "A Rust Microservice with an Actix RESTful frontend and a Diesel/Po
 authors: [ "Jimmie Fulton <jimmie.fulton@gmail.com>" ]
 languages: [ "Rust" ]
 frameworks: [ "Actix Web", "Diesel", "Clap" ]
-tags: [ "Service", "Workspace", "REST ]
+tags: [ "Service", "Workspace", "REST" ]
 
 script:
   - if:
