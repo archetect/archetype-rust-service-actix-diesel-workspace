@@ -4,4 +4,6 @@ A Rust Microservice with an Actix RESTful frontend and a Diesel/PostgreSQL backe
 
 To generate a project from this archetype using Archetect:
 
-    $> archetect render https://github.com/archetect/archetype-rust-service-actix-diesel-workspace.git
+```shell
+archetect render https://github.com/archetect/archetype-rust-service-actix-diesel-workspace.git
+```
